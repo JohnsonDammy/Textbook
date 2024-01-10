@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+::-moz-selection {
+  color: $white;
+  background: $dark-green;
+}
+::selection {
+  color: $white;
+  background: $dark-green;
+}
+html {
+  font-size: 10px; // 1Rem = 10px the reason why we have mention 10px in HTML.
+}
+
+body {
+  @include custom-scroll-bar();
+  color: $black;
+  font-family: $primary-font;
+  font-size: 1.6rem;
+  font-weight: normal;
+  line-height: 1;
+}

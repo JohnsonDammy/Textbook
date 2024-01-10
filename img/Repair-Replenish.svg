@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="49" viewBox="0 0 50 49">
+  <g id="Group_161" data-name="Group 161" transform="translate(0.29)">
+    <g id="Ellipse_9" data-name="Ellipse 9" transform="translate(-0.29)" fill="#fff" stroke="#707070" stroke-width="1">
+      <ellipse cx="25" cy="24.5" rx="25" ry="24.5" stroke="none"/>
+      <ellipse cx="25" cy="24.5" rx="24.5" ry="24" fill="none"/>
+    </g>
+    <g id="Group_14" data-name="Group 14" transform="translate(15.073 15.074)">
+      <rect id="Rectangle_92" data-name="Rectangle 92" width="22" height="21" transform="translate(-0.364 -0.074)" fill="none"/>
+    </g>
+    <g id="Group_18" data-name="Group 18" transform="translate(16.625 14.762)">
+      <g id="Group_17" data-name="Group 17">
+        <g id="Group_15" data-name="Group 15" transform="translate(10.016 10.968)">
+          <path id="Path_23" data-name="Path 23" d="M21,17.767l-4.9-4.9h-.915L12.84,15.217v.915l4.9,4.9a.92.92,0,0,0,1.3,0L21,19.07A.92.92,0,0,0,21,17.767Z" transform="translate(-12.84 -12.87)"/>
+        </g>
+        <g id="Group_16" data-name="Group 16">
+          <path id="Path_24" data-name="Path 24" d="M16.174,9.491l1.3-1.3,1.959,1.959a2.772,2.772,0,0,0,0-3.918L16.165,2.959l-1.3,1.3V1.656L14.215,1,10.944,4.271l.656.656h2.615l-1.3,1.3.979.979-2.67,2.67L7.405,6.063V4.751l-2.79-2.79L2,4.576l2.8,2.8H6.1l3.816,3.816-.785.785H7.174l-4.9,4.9a.92.92,0,0,0,0,1.3l1.959,1.959a.92.92,0,0,0,1.3,0l4.9-4.9V13.28l4.759-4.759Z" transform="translate(-2 -1)"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,94 @@
+.popup-alert {
+  max-width: 35rem;
+  width: 100%;
+  margin: 0 auto;
+  .modal-content {
+    border-radius: 0.5rem;
+    @include shadoweffect();
+    border: none;
+    .modal-body {
+      padding: 2.5rem 1.8rem;
+    }
+  }
+  .modal-footer {
+    padding: 1.5rem;
+  }
+  &_title {
+    color: $light-dark-green;
+    font-weight: bold;
+    font-size: 2.2rem;
+    margin: 1rem 0;
+  }
+  &_des {
+    font-size: 2rem;
+  }
+}
+
+// reset
+.modal-backdrop.show {
+  background: $light-green;
+  opacity: 0.5;
+}
+.modal-content {
+  overflow-y: auto;
+  @include custom-scroll-bar();
+}
+
+.add-photo-popup {
+  &__content {
+    padding: 5rem;
+    @include shadoweffect();
+    border-radius: 0.5rem;
+    border: 0;
+  }
+  &__header {
+    @include flexspace();
+    padding-bottom: 2rem;
+    border-bottom: 1px solid $grey;
+    &_text {
+      h5 {
+        color: $dark-green;
+        font-weight: bold;
+        font-size: 2.2rem;
+      }
+    }
+    a {
+      i {
+        color: $dark-green;
+        font-weight: bold;
+        font-size: 2.2rem;
+      }
+    }
+  }
+  &__body {
+    padding: 3rem 0;
+  }
+  &__footer {
+    text-align: end;
+  }
+}
+
+// extra popup classes
+
+@include breakpoint("desktop-min") {
+  .model-xxl {
+    max-width: 150rem;
+  }
+  .model-xl {
+    max-width: 120rem;
+  }
+  .model-lg {
+    max-width: 90rem;
+  }
+}
+@include breakpoint("ipad-max") {
+  .model-xxl {
+    max-width: 140rem;
+  }
+  .model-xl {
+    max-width: 120rem;
+  }
+  .model-lg {
+    max-width: 90rem;
+  }
+}

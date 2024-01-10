@@ -1,0 +1,118 @@
+.table-responsive {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  @include custom-scroll-bar();
+}
+.table {
+  margin-bottom: 2rem;
+  thead {
+    @include primary-bg();
+    tr {
+      th {
+        color: $white;
+        font-weight: 600;
+      }
+    }
+  }
+  tbody {
+    background-color: $light-grey;
+  }
+  td,
+  th {
+    padding: 1.8rem;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+
+.border-table {
+  thead {
+    tr {
+      th {
+        &:first-child {
+          text-align: start;
+        }
+      }
+    }
+  }
+  tbody {
+    tr {
+      td {
+        border: 0.5px solid $black;
+        &:first-child {
+          text-align: start;
+          border-left-width: 0;
+        }
+        &:last-child {
+          border-right-width: 0;
+        }
+      }
+      &:nth-child(even) {
+        td {
+          padding: 2rem;
+        }
+      }
+      &:nth-child(odd) {
+        td {
+          &:nth-child(1) {
+            padding: 1.8rem !important;
+          }
+          padding: 0;
+        }
+      }
+    }
+  }
+  .form-check-input[type="checkbox"] {
+    border: none;
+    padding: 1.2rem;
+    border-radius: 0;
+    width: 100%;
+    margin: 0;
+    height: 5.5rem;
+    cursor: pointer;
+  }
+  .form-check-input {
+    &:focus {
+      -webkit-box-shadow: 0 0 0 0.25rem rgba(91, 224, 79, 0.25);
+      box-shadow: 0 0 0 0.25rem rgba(91, 224, 79, 0.25);
+    }
+    &:checked {
+      background-color: transparent;
+    }
+  }
+
+  .form-check-input:checked[type="checkbox"] {
+    background-image: url("#{$images-path}/table-check.svg");
+    background-size: auto;
+    background-color: $white;
+  }
+  .form-check-input:disabled {
+    cursor: not-allowed;
+    pointer-events: auto;
+    background: #bda7a7;
+  }
+}
+
+// table side
+.table-side {
+  td,
+  th {
+    &:first-child {
+      text-align: start;
+    }
+    &:nth-child(2) {
+      text-align: center;
+    }
+    &:last-child {
+      text-align: end;
+    }
+  }
+}
+
+// table table-nnowrap
+.table-nnowrap {
+  td,
+  th {
+    white-space: normal;
+  }
+}

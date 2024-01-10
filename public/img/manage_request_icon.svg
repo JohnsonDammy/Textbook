@@ -1,0 +1,15 @@
+<svg id="new_releases_black_24dp" xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #359934;
+      }
+    </style>
+  </defs>
+  <path id="Path_117" data-name="Path 117" class="cls-1" d="M0,0H21V21H0Z"/>
+  <path id="Path_118" data-name="Path 118" class="cls-2" d="M20.25,10.693,18.115,8.26l.3-3.22-3.159-.718L13.6,1.54,10.625,2.817,7.65,1.54,6,4.322l-3.159.709.3,3.22L1,10.693l2.135,2.432-.3,3.229L6,17.071,7.65,19.854l2.975-1.286L13.6,19.845l1.654-2.783,3.159-.717-.3-3.22ZM11.5,15.068H9.75v-1.75H11.5Zm0-3.5H9.75V6.318H11.5Z" transform="translate(-0.125 -0.192)"/>
+</svg>

@@ -1,0 +1,63 @@
+.authincation {
+  .auth-form {
+    @include shadoweffect();
+    background-color: $white;
+    padding: 5rem 3.5rem;
+    min-height: 55rem;
+    height: 100%;
+    &_title {
+      font-weight: bold;
+      color: $dark-green;
+      margin-bottom: 6rem;
+    }
+    .form-group {
+      margin-top: 5rem;
+    }
+    .pass-box {
+      position: relative;
+      i {
+        position: absolute;
+        right: 3rem;
+        top: 2rem;
+        // margin-top: -23px;
+        cursor: pointer;
+        font-size: 2.5rem;
+        color: $light-green;
+      }
+    }
+    .reset-password {
+      margin-top: 2rem;
+      // a {
+      //   color: #1492e6;
+      // }
+    }
+    .submit-btn {
+      margin-top: 6rem;
+    }
+  }
+  &-footer {
+    height: 19rem;
+    @include primary-bg();
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: -1;
+  }
+}
+.reset-password-des__list {
+  list-style: disc;
+  font-size: 1.4rem;
+  margin-left: 2rem;
+  color: rgb(207, 57, 57);
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+@include breakpoint("ipad-max") {
+  .authincation {
+    .auth-form {
+      padding: 3rem 2.5rem;
+      margin-top: 1rem;
+    }
+  }
+}

@@ -1,0 +1,487 @@
+@extends('layouts.layout')
+@section('head-script')
+    <script>
+        // alert('Hello')
+        // console.log('hello')
+        // var broken_items = <?php echo $school ? json_encode($school['broken_items']) : '[]'; ?>;
+        // console.log(broken_items)
+        // console.log("hi")
+    </script>
+
+    <script>
+        var broken_item_array = [];
+    </script>
+@endsection
+@section('title', 'Create New Request')
+@section('content')
+    <main>
+        <div class="container">
+            <!-- breadcrumb -->
+            <div class="row align-items-center border-bottom border-2">
+                <div class="col-12 col-md-12 col-xl-12">
+                    <div class="page-titles">
+                        <h4>Furniture Replacement</h4>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('furniture-replacement.index') }}">Furniture
+                                    Replacement</a>
+                            </li>
+                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Furniture Replacement
+                                    Process</a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center my-3">
+                <div class="col-12 col-md-3">
+                    <div class="process row align-items-center text-center">
+                        <div class="col content-col">
+                            <div class="circle-icon-container">
+                                <i class="ri-list-check"></i>
+                            </div>
+                            <p>Transactions List</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-9">
+                    <div class="process row align-items-center text-center">
+                        <div class="col content-col active">
+                            <div class="circle-icon-container">
+                                <i class="ri-add-fill"></i>
+                            </div>
+                            <p>Create Request</p>
+                        </div>
+                        <div class="col arrow-col ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35.439" height="17.42"
+                                viewBox="0 0 35.439 17.42">
+                                <path id="Icon_awesome-long-arrow-alt-right" data-name="Icon awesome-long-arrow-alt-right"
+                                    d="M24.834,15.8H.949A.949.949,0,0,0,0,16.753v4.43a.949.949,0,0,0,.949.949H24.834v3.643a1.9,1.9,0,0,0,3.241,1.342l6.808-6.808a1.9,1.9,0,0,0,0-2.685l-6.808-6.808a1.9,1.9,0,0,0-3.241,1.342Z"
+                                    transform="translate(0 -10.258)" />
+                            </svg>
+
+                        </div>
+                        <div class="col content-col ">
+                            <div class="circle-icon-container">
+                                <i class="ri-layout-top-2-fill"></i>
+                            </div>
+                            <p>Collect Furniture Items</p>
+                        </div>
+                        <div class="col arrow-col ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35.439" height="17.42"
+                                viewBox="0 0 35.439 17.42">
+                                <path id="Icon_awesome-long-arrow-alt-right" data-name="Icon awesome-long-arrow-alt-right"
+                                    d="M24.834,15.8H.949A.949.949,0,0,0,0,16.753v4.43a.949.949,0,0,0,.949.949H24.834v3.643a1.9,1.9,0,0,0,3.241,1.342l6.808-6.808a1.9,1.9,0,0,0,0-2.685l-6.808-6.808a1.9,1.9,0,0,0-3.241,1.342Z"
+                                    transform="translate(0 -10.258)" />
+                            </svg>
+
+                        </div>
+                        <div class="col content-col">
+                            <div class="circle-icon-container">
+                                <i class="ri-hammer-fill"></i>
+                            </div>
+                            <p>Repair/ Replenish</p>
+                        </div>
+                        <div class="col arrow-col ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35.439" height="17.42"
+                                viewBox="0 0 35.439 17.42">
+                                <path id="Icon_awesome-long-arrow-alt-right" data-name="Icon awesome-long-arrow-alt-right"
+                                    d="M24.834,15.8H.949A.949.949,0,0,0,0,16.753v4.43a.949.949,0,0,0,.949.949H24.834v3.643a1.9,1.9,0,0,0,3.241,1.342l6.808-6.808a1.9,1.9,0,0,0,0-2.685l-6.808-6.808a1.9,1.9,0,0,0-3.241,1.342Z"
+                                    transform="translate(0 -10.258)" />
+                            </svg>
+
+                        </div>
+                        <div class="col content-col">
+                            <div class="circle-icon-container">
+                                <i class="ri-truck-fill"></i>
+                            </div>
+                            <p>Deliver Furniture Items</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 my-3">
+                    <div class=" bg-light fw-bold py-4 color-primary px-5">
+                        <p class="mb-0">
+                            Create Request
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-12 my-3">
+                    <div class="row g-4">
+                        <div class="form-group col-12 col-md-6 col-xl-3">
+                            <input type="text" class="form-control form-control-lg" required="required"
+                                value="{{ Auth::user()->name }}" disabled placeholder=" ">
+                            <label>School Name</label>
+                        </div>
+                        <div class="form-group col-12 col-md-6 col-xl-3">
+                            <input type="text" class="form-control form-control-lg" value="{{ Auth::user()->username }}"
+                                disabled required="required" placeholder=" ">
+                            <label>School EMIS Number</label>
+                        </div>
+                        <div class="form-group col-12 col-md-6 col-xl-4">
+                            <input type="number" class="form-control form-control-lg" required="required" placeholder=" "
+                                value="{{ $school ? $school['total_furniture'] : '' }}">
+                            <label>School Full Furniture Count - Including Working Furniture</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 mt-4 mb-2">
+                    <a data-bs-toggle="modal" data-bs-target="#models" class="btn">+ Add broken furniture
+                        item</a>
+                </div>
+                <div class="col-12 mt-2">
+                    <div class=" bg-light fw-bold py-4 color-primary px-5">
+                        <p class="mb-0">
+                            Broken Furniture Items
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Furniture Category</th>
+                                    <th>Furniture Item</th>
+                                    <th>Collection Count</th>
+                                    <th>Manage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="broken-item-table">
+                                {{-- <tr>
+                                    <td>Desks</td>
+                                    <td>Short Desk</td>
+                                    <td>10</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="#" class="color-primary me-4 fs-2">
+                                                <i class="ri-pencil-fill"></i>
+                                            </a>
+                                            <a href="#" class="fs-2">
+                                                <i class="ri-delete-bin-7-fill"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr> --}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="text-end submit-btn my-3">
+                <a href="Create-New-Request.html" class="btn-reset text-decoration-underline">Cancel</a>
+                <a href="Create-New-Request.html" class="btn btn-primary ms-3" data-bs-toggle="modal"
+                    data-bs-target="#alret-pop">Save</a>
+                <a href="Create-New-Request.html" class="btn btn-primary ms-3 disabled">Submit</a>
+            </div>
+        </div>
+    </main>
+
+    <!--alret popup -->
+    <div class="modal fade" id="alret-pop" tabindex="-1" aria-labelledby="alret-popLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered popup-alert">
+            <div class="modal-content rounded-0">
+                <div class="modal-body">
+                    <div class="text-center">
+                        <p class="popup-alert_des fw-bold">Do you want to Cancel the process?</p>
+                        <p>You cannot undo this action</p>
+                    </div>
+
+                </div>
+                <div class="modal-footer justify-content-around text-center">
+                    <button type="button" class="btn btn--dark px-5" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-secondary px-5" data-bs-dismiss="modal">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- add photo model popup -->
+    <div class="modal fade" id="models" class="models" tabindex="-1" aria-labelledby="modelsLabel"
+        aria-hidden="true">
+        <div class="modal-dialog model-xl modal-dialog-centered">
+            <div class="modal-content models__content">
+                <div class="models__header">
+                    <div class="models__header_text">
+                        <h5 class="modal-title">+ Add broken furniture
+                            item</h5>
+                    </div>
+                    <a type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ri-close-fill"></i>
+                    </a>
+                </div>
+                <div class="models__body">
+                    <div class="row">
+                        <div class="col-12 col-md-12 my-5">
+                            <div class="row g-5">
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <select class="form-control form-control-lg wide" id="furniture-category"
+                                        onchange="getItems()">
+                                        <option selected disabled value="">Furniture Category</option>
+                                        @foreach (getListOfAllCategories() as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ old('category_id') == $category->id ? 'selected="selected"' : '' }}>
+                                                {{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <select class="form-control form-control-lg wide" id="furniture-items">
+                                        <option selected disabled value="">Furniture Items</option>
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- dyn -->
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="furniture-category-item">
+                                <span class="furniture-category-item_chip">
+                                    <span class="furniture-category-item_chip__text">Desks</span>
+                                    <button type="button" class="furniture-category-item_chip__action"><i
+                                            class="ri-close-line"></i></button>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <ul class="list-group">
+                                <li class="list-group-item border-0">
+                                    <div class="d-flex ">
+                                        <div class="flex-shrink-1 flex-grow-1">
+                                            <div class="d-flex align-items-center">
+                                                <!-- <div class=""> -->
+                                                <h6 class="text-dark">Short Desks</h6>
+                                                <!-- </div> -->
+                                                <div class="ms-auto text-muted furniture-items-counter fs-2">
+                                                    <form>
+                                                        <div class="value-button" id="decrease" onclick="decreaseValue()"
+                                                            value="Decrease Value">-</div>
+                                                        <input type="number" id="number" value="0" />
+                                                        <div class="value-button" id="increase" onclick="increaseValue()"
+                                                            value="Increase Value">+</div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="models__footer">
+                    <button type="button" id="close-broken-item-btn-id" class="btn btn--dark px-5"
+                        data-bs-dismiss="modal">Clear</button>
+                    <button type="button" class="btn btn-secondary px-5" data-bs-dismiss=""
+                        id="add-broken-item-btn-id">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="update-broken-item-modal"></div>
+    <script>
+        function getItems() {
+            var catid = $("#furniture-category option:selected").val();
+            console.log(catid)
+            $.ajax({
+                url: "/getstockitems",
+                type: "get",
+                data: {
+                    catid: catid
+                },
+                dataType: "json",
+
+                success: function(response) {
+                    let itemdata = response;
+                    console.log(itemdata)
+                    if (itemdata.length > 0) {
+                        $("#furniture-items").html("")
+                        var itemHtml = "<option selected disabled value=''>Furniture Items</option>"
+                        $.each(itemdata, function(index, value) {
+                            console.log(value);
+                            itemHtml += `<option value = ${value.id}>${value.name}</option>`
+                        });
+                        $("#furniture-items").html(itemHtml)
+
+                    }
+                },
+                error: function() {
+                    //alert('Error while request..');
+                    console.log("Error while request..");
+                },
+            });
+        }
+    </script>
+    <script>
+        function brokenItemAppend() {
+            if (broken_item_array.length > 0) {
+                $('#broken-item-table').html("");
+                var list = "";
+                $.each(broken_item_array, function(index, value) {
+                    list += `<tr>
+                                    <td>${value.category_name}</td>
+                                    <td>${value.item_name}</td>
+                                    <td>${value.count}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="javascript:void(0)" class="color-primary me-4 fs-2" onclick="editBrokenItemFromList(${index})">
+                                                <i class="ri-pencil-fill"></i>
+                                            </a>
+                                            <a href="javascript:void(0)" id="delete-broken-item"  class="fs-2">
+                                                <i class="ri-delete-bin-7-fill" onclick="removeBrokenItemFromList(${index})" ></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                });
+                $('#broken-item-table').html(list);
+            } else {
+                $('#broken-item-table').html(`<tr>
+                                    <td></td>
+                                    <td>No data found</td>
+                                    <td></td>
+                                    <td>
+                                       
+                                    </td>
+                                </tr>`)
+            }
+        }
+
+        $("#add-broken-item-btn-id").click(function() {
+            var cate_id = $("#furniture-category option:selected").val();
+            var cate_name = $('#furniture-category option:selected').html().trim()
+            var item_id = $("#furniture-items option:selected").val()
+            var item_name = $("#furniture-items option:selected").html().trim();
+            var count = $('#number').val();
+            if (cate_id != '' && item_id != '' && count != 0) {
+                var arr = {
+                    "category_id": cate_id,
+                    "category_name": cate_name,
+                    "item_id": item_id,
+                    "item_name": item_name,
+                    "count": count
+                };
+                broken_item_array.push(arr);
+                $("#furniture-category").val($('#furniture-category option:first').val())
+                $("#furniture-items").html('<option selected disabled value="">Furniture Items</option>');
+                $('#number').val(0)
+                count = 0;
+                brokenItemAppend();
+                $('#close-broken-item-btn-id').click();
+            } else {
+                alert("please select all fields")
+            }
+
+
+        });
+
+
+
+        function removeBrokenItemFromList(e) {
+            broken_item_array.splice(e, 1);
+            brokenItemAppend();
+        }
+
+        function editBrokenItemFromList(e) {
+            console.log(broken_item_array[e]);
+
+            $('#update-broken-item-modal').html(`<div class="modal fade show" id="models" tabindex="-1" aria-labelledby="modelsLabel" aria-modal="true" role="dialog" style="display: block; padding-left: 0px;">
+        <div class="modal-dialog model-xl modal-dialog-centered">
+            <div class="modal-content models__content">
+                <div class="models__header">
+                    <div class="models__header_text">
+                        <h5 class="modal-title">+ Add broken furniture
+                            item</h5>
+                    </div>
+                    <a type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ri-close-fill"></i>
+                    </a>
+                </div>
+                <div class="models__body">
+                    <div class="row">
+                        <div class="col-12 col-md-12 my-5">
+                            <div class="row g-5">
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <select class="form-control form-control-lg wide" id="furniture-category" onchange="getItems()">
+                                        <option selected="" disabled="" value="">Furniture Category</option>
+                                                                                    
+                                     </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <select class="form-control form-control-lg wide" id="furniture-items"><option selected="" disabled="" value="">Furniture Items</option></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- dyn -->
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="furniture-category-item">
+                                <span class="furniture-category-item_chip">
+                                    <span class="furniture-category-item_chip__text">Desks</span>
+                                    <button type="button" class="furniture-category-item_chip__action"><i class="ri-close-line"></i></button>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <ul class="list-group">
+                                <li class="list-group-item border-0">
+                                    <div class="d-flex ">
+                                        <div class="flex-shrink-1 flex-grow-1">
+                                            <div class="d-flex align-items-center">
+                                                <!-- <div class=""> -->
+                                                <h6 class="text-dark">Short Desks</h6>
+                                                <!-- </div> -->
+                                                <div class="ms-auto text-muted furniture-items-counter fs-2">
+                                                    <form>
+                                                        <div class="value-button" id="decrease" onclick="decreaseValue()" value="Decrease Value">-</div>
+                                                        <input type="number" id="number" value="0">
+                                                        <div class="value-button" id="increase" onclick="increaseValue()" value="Increase Value">+</div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="models__footer">
+                    <button type="button" id="close-broken-item-btn-id" class="btn btn--dark px-5" data-bs-dismiss="modal">Clear</button>
+                    <button type="button" class="btn btn-secondary px-5" data-bs-dismiss="" id="add-broken-item-btn-id">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-backdrop fade show"></div>`);
+        }
+    </script>
+    <script>
+        NiceSelect.bind(document.getElementById("furniture-category"));
+        NiceSelect.bind(document.getElementById("furniture-items"));
+
+        function increaseValue() {
+            var value = parseInt(document.getElementById('number').value, 10);
+            value = isNaN(value) ? 0 : value;
+            value++;
+            document.getElementById('number').value = value;
+        }
+
+        function decreaseValue() {
+            var value = parseInt(document.getElementById('number').value, 10);
+            value = isNaN(value) ? 0 : value;
+            value < 1 ? value = 1 : '';
+            value--;
+            document.getElementById('number').value = value;
+        }
+    </script>
+
+@endsection

@@ -1,0 +1,41 @@
+.card {
+  margin-bottom: 1.5rem;
+  border: none;
+  border-radius: 1.5rem;
+  @include shadoweffect();
+}
+
+.card-body {
+  padding: 2rem;
+  .card-title {
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+  }
+}
+
+// dashboard card
+.dashboard-card {
+  padding: 2.8rem 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  &.success {
+    background-color: #70b345;
+  }
+  &.danger {
+    background-color: #c00000;
+  }
+  &.warning {
+    background-color: #f67023;
+  }
+  &.primary {
+    background-color: #2f5597;
+  }
+  &.info {
+    background-color: #5b9bd5;
+  }
+  p {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: $white;
+  }
+}

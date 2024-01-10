@@ -1,0 +1,9 @@
+/node_modules
+/vendor
+.env
+composer.lock
+package-lock.json
+/public/uploads/images
+/public/uploads/replenishment_proof
+/public/uploads/signed_delivery
+/public/storage

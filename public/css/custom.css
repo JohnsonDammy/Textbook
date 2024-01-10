@@ -1,0 +1,72 @@
+#auto_suggestions {
+  position: absolute;
+  width: 100%;
+  z-index: 9;
+  padding: 15px 0;
+
+}
+
+.nice-select .nice-select-dropdown {
+  z-index: 99;
+}
+
+.parsley-required,
+.parsley-type,
+.parsley-minlength,
+.parsley-maxlength,
+.parsley-length,
+.parsley-pattern {
+  color: #DC3545 !important;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.error-msg {
+  margin-top: 10px;
+}
+
+.printanchor {
+  cursor: pointer;
+}
+
+/* eye button for IE browser */
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* hide datatable */
+/* .dataTables_wrapper {
+  position: relative;
+  clear: both;
+  display: none;
+} */
+
+a[type=reset] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.fullcount {
+  background-color: #f4f9f4;
+  border: none;
+  height: 40px;
+  margin: 0;
+  text-align: center;
+  width: 45px
+}
+
+.width-50 {
+  width: 50%;
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.download-icon{
+  width: 7%;
+}

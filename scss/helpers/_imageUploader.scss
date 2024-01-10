@@ -1,0 +1,110 @@
+.image-uploader {
+  min-height: 15rem;
+  //   border: 1px solid #d9d9d9;
+  position: relative;
+  background-color: $light-grey;
+  cursor: pointer;
+
+  border-radius: 0.5rem;
+}
+.image-uploader.drag-over {
+  background-color: #f3f3f3;
+}
+.image-uploader input[type="file"] {
+  width: 0;
+  height: 0;
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+.image-uploader .upload-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.image-uploader .upload-text i {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+.image-uploader .upload-text span {
+  display: block;
+}
+.image-uploader.has-files .upload-text {
+  display: none;
+}
+.image-uploader .uploaded {
+  padding: 0.5rem;
+  line-height: 0;
+}
+.image-uploader .uploaded .uploaded-image {
+  display: inline-block;
+  width: calc(16.6666667% - 1rem);
+  padding-bottom: calc(16.6666667% - 1rem);
+  height: 0;
+  position: relative;
+  margin: 0.5rem;
+  background: #f3f3f3;
+  -webkit-transition: 0.2s all ease-in;
+  -o-transition: 0.2s all ease-in;
+  transition: 0.2s all ease-in;
+  cursor: default;
+  &:hover {
+    img {
+      -webkit-filter: brightness(0.5);
+      filter: brightness(0.5);
+    }
+    .delete-image {
+      display: block;
+    }
+  }
+}
+.image-uploader .uploaded .uploaded-image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+  position: absolute;
+  border-radius: 0.5rem;
+}
+.image-uploader .uploaded .uploaded-image .delete-image {
+  display: none;
+  cursor: pointer;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  border-radius: 50%;
+  padding: 0.3rem;
+  background: none;
+  -webkit-appearance: none;
+  border: none;
+}
+// .image-uploader .uploaded .uploaded-image:hover .delete-image {
+//   display: block;
+// }
+// .image-uploader .uploaded .uploaded-image .delete-image i {
+//   color: #fff;
+//   font-size: 1.4rem;
+// }
+.uploader-title {
+  color: $dark-green;
+  font-size: 2rem;
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+}

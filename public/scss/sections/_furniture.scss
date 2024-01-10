@@ -1,0 +1,160 @@
+.furniture-category-item {
+  &_chip {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+    border: 0.025px solid $dark-green;
+    border-radius: 20px;
+    background-color: $light-grey;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    margin: 2px 0;
+    font-size: 0;
+    white-space: nowrap;
+    padding-right: 4px;
+    &__text {
+      font-size: 1.4rem;
+      display: inline-block;
+    }
+    &__action {
+      height: 24px;
+      width: 24px;
+      background: 0 0;
+      cursor: pointer;
+      padding: 0;
+      margin: 0 0 0 4px;
+      font-size: 1.6rem;
+      text-decoration: none;
+      color: $dark-green;
+      border: none;
+      outline: none;
+      display: inline-block;
+      overflow: hidden;
+      text-align: center;
+    }
+  }
+}
+
+.furniture-items-counter {
+  form {
+    .value-button {
+      display: inline-block;
+      color: $dark-green;
+      font-size: 3rem;
+      margin: 0px;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.1rem 0;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      font-weight: 600;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    #decrease {
+      margin-right: -0.7rem;
+      background-color: #e6f6e6;
+      border-radius: 21px 0px 0px 21px;
+    }
+    #increase {
+      margin-left: -0.5rem;
+      background-color: #e6f6e6;
+      border-radius: 0px 21px 21px 0px;
+    }
+    #input-wrap {
+      margin: 0px;
+      padding: 0px;
+    }
+    input#number {
+      text-align: center;
+      border: none;
+      background-color: $light-grey;
+      margin: 0px;
+      width: 45px;
+      height: 40px;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+// process
+.process {
+  .content-col {
+    .circle-icon-container {
+      margin-bottom: 1.5rem;
+      border: 1px solid #767676;
+      display: -webkit-inline-box;
+      display: -ms-inline-flexbox;
+      display: inline-flex;
+      font-size: 3rem;
+      padding: 1rem;
+      border-radius: 50%;
+      i {
+        color: $black;
+      }
+      @include breakpoint("ipad-max") {
+        img {
+          width: 3rem;
+        }
+      }
+    }
+    font-size: 1.2rem;
+    color: $grey;
+    text-transform: capitalize;
+    font-weight: 600;
+    @include breakpoint("ipad-max") {
+      font-size: 1rem;
+      white-space: nowrap;
+      margin-bottom: 1.5rem;
+    }
+    &.active {
+      font-weight: bold;
+      color: $black;
+      .circle-icon-container {
+        border: none;
+        color: $white;
+        background-color: $pending;
+        i {
+          color: $white;
+        }
+      }
+    }
+    &.success {
+      .circle-icon-container {
+        border: none;
+        color: $white;
+        background-color: $dark-green;
+        i {
+          color: $white;
+        }
+      }
+      & + .arrow-col {
+        svg {
+          fill: $dark-green;
+        }
+      }
+    }
+  }
+  .arrow-col {
+    @include breakpoint("ipad-max") {
+      img {
+        width: 1.8rem;
+        height: auto;
+      }
+    }
+  }
+}

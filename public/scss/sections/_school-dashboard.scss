@@ -1,0 +1,38 @@
+.school-dashboard-wrap {
+  background-color: $light-grey;
+  @include flexcenter();
+  height: 100%;
+  min-height: 60rem;
+  a {
+    min-width: 25rem;
+  }
+}
+
+@include breakpoint("ipad-max") {
+  .school-dashboard-wrap {
+    min-height: 30rem;
+  }
+}
+
+// welcome section
+.welcome-wrap {
+  background-image: url("#{$images-path}/welcome.svg");
+  height: 500px;
+  width: auto;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  margin-top: 2rem;
+  opacity: 0.5;
+}
+
+.not-found-wrap {
+  background-image: url("#{$images-path}/404.svg");
+  height: 500px;
+  width: auto;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  margin-top: 2rem;
+  // opacity: 0.5;
+}

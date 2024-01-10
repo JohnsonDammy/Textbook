@@ -1,0 +1,209 @@
+/* placeholder */
+@mixin input-placeholder {
+  &.placeholder {
+    @content;
+  }
+  &:-moz-placeholder {
+    @content;
+  }
+  &::-moz-placeholder {
+    @content;
+  }
+  &:-ms-input-placeholder {
+    @content;
+  }
+  &::-webkit-input-placeholder {
+    @content;
+  }
+}
+
+$breakpoints: (
+  "custom-small-mobile-max": (
+    max-width: 360px,
+  ),
+  "portrait-mobile-max": (
+    max-width: 575px,
+  ),
+  "mobile-min": (
+    min-width: 576px,
+  ),
+  "mobile-max": (
+    max-width: 767px,
+  ),
+  "ipad-min": (
+    min-width: 768px,
+  ),
+  "ipad-max": (
+    max-width: 991px,
+  ),
+  "desktop-min": (
+    min-width: 992px,
+  ),
+  "desktop-max": (
+    max-width: 1199px,
+  ),
+  "large-desktop-min": (
+    min-width: 1200px,
+  ),
+  "medium-large-desktop-min": (
+    min-width: 1366px,
+  ),
+  "medium-large-desktop-maxwidth": (
+    max-width: 1279px,
+  ),
+  "medium-large-desktop-max": (
+    max-width: 1400px,
+  ),
+  "large-desktop-max": (
+    max-width: 1560px,
+  ),
+);
+@mixin breakpoint($name) {
+  @if map-has-key($breakpoints, $name) {
+    @media #{inspect(map-get($breakpoints, $name))} {
+      @content;
+    }
+  } @else {
+    @warn "Couldn't find a breakpoint named `#{$name}`.";
+  }
+}
+
+@mixin d-flex {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+@mixin flexcenter {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+@mixin flexspace {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+// Opacity
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: $opacity * 100;
+  filter: alpha(opacity=$opacity-ie); //IE8
+}
+
+// Transition
+@mixin transition($what: all, $time: 0.3s, $how: ease-in-out) {
+  -webkit-transition: $what $time $how;
+  -o-transition: $what $time $how;
+  transition: $what $time $how;
+}
+
+// Horizontal and Center Align using Transform
+@mixin horizontal-center-transform {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@mixin vertical-center-transform {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@mixin horizontal-vertical-center-transform {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin position-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+// Center Block
+@mixin center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin primary-bg {
+  background: transparent -o-linear-gradient(189deg, #7cbf7a 0%, #3c9e3b 100%);
+  background: transparent linear-gradient(261deg, #7cbf7a 0%, #3c9e3b 100%);
+}
+@mixin primary-color {
+  color: transparent -o-linear-gradient(189deg, #7cbf7a 0%, #3c9e3b 100%);
+  color: transparent linear-gradient(261deg, #7cbf7a 0%, #3c9e3b 100%);
+}
+
+@mixin shadoweffect {
+  box-shadow: 0px 3px 6px #00000029;
+}
+
+@mixin darkeffect {
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
+}
+
+// custom scroll-bar
+@mixin custom-scroll-bar() {
+  &::-webkit-scrollbar {
+    border-radius: 0.5rem;
+    height: 10px;
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #222325;
+    border-radius: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 0.5rem;
+    background-color: rgb(240, 238, 238);
+  }
+}
+
+// no scroll bar
+@mixin no-scroll-bar() {
+  &::-webkit-scrollbar {
+    height: 0;
+    width: 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    height: 0;
+    width: 0;
+  }
+
+  &::-webkit-scrollbar-track {
+    height: 0;
+    width: 0;
+  }
+}

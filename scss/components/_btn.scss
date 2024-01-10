@@ -1,0 +1,68 @@
+.btn {
+  font-size: 1.6rem;
+  color: $white;
+  padding: 1.4rem 2rem;
+  // -webkit-box-shadow: 0px 3px 6px #00000029;
+  // box-shadow: 0px 3px 6px #00000029;
+  border: none;
+  border-radius: 3.9rem;
+  font-weight: bold;
+  line-height: 1;
+  text-transform: capitalize;
+  -webkit-transition: 0.3s all ease-in;
+  -o-transition: 0.3s all ease-in;
+  transition: 0.3s all ease-in;
+  background: transparent -o-linear-gradient(189deg, #85c286 0%, #44a244 100%);
+  background: transparent linear-gradient(261deg, #85c286 0%, #44a244 100%);
+  &-primary {
+    // background: transparent -o-linear-gradient(189deg, #85c286 0%, #44a244 100%);
+    // background: transparent linear-gradient(261deg, #85c286 0%, #44a244 100%);
+    &-outline {
+      border: 2px solid #47a347;
+      color: #4aa54a;
+      background: $white;
+      &:hover {
+        border: 2px solid transparent;
+      }
+    }
+  }
+
+  &--dark {
+    background: $black;
+    &:hover {
+      color: $white;
+      background: $black;
+    }
+  }
+  &-lg {
+    font-size: 2.2rem;
+    padding: 2rem 4rem;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    color: $white;
+    border: none;
+    -webkit-box-shadow: 0px 3px 6px $light-dark-green;
+    box-shadow: 0px 3px 6px $light-dark-green;
+    background-color: $dark-green;
+  }
+}
+
+// btn reset
+.btn-reset {
+  border: none;
+  background: none;
+}
+.btn-add-photo {
+  border: 1px dashed $grey;
+  border-radius: 5px;
+  padding: 1.4rem 1.5rem;
+  text-align: center;
+  text-decoration: underline;
+  color: $grey;
+  text-transform: capitalize;
+  &:hover {
+    @include shadoweffect();
+  }
+}

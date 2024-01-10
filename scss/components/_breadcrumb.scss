@@ -1,0 +1,48 @@
+.page-titles {
+  margin-bottom: 1.5rem;
+  display: block;
+  padding: 1.5rem 0;
+  h4 {
+    margin-bottom: 1rem;
+    margin-top: 0;
+    color: $black;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  .breadcrumb {
+    margin-bottom: 0;
+    padding: 0;
+    li {
+      margin-top: 0;
+      margin-bottom: 0;
+      a {
+        color: #656778;
+      }
+      &.active a {
+        color: $green;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+#search-btn {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: $light-grey;
+  padding: 0.2rem 1rem 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  line-height: 1;
+  form {
+    width: 100%;
+  }
+  input {
+    background: $light-grey;
+    font-size: inherit;
+    line-height: 1;
+  }
+}
