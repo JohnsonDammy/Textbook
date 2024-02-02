@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\savedSuppliers;
 use App\Models\SuppliyerModel;
+use App\Models\capturedsuppliers;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SchoolSuppliyerModel;
 
@@ -19,7 +21,7 @@ class SuppliyerController extends Controller
     public function index()
     {
 
-        // //INSERT INTO `school_suppliyer`(`Id`, `Suppliyer_id`, `Emis`, `IsActive`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
+        // //INSERT INTO school_suppliyer(Id, Suppliyer_id, Emis, IsActive, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
         // $emis = Auth::user()->username;
 
         // //$Sup  = SchoolSuppliyerModel::where('', $district_id)->get();
@@ -46,14 +48,20 @@ class SuppliyerController extends Controller
 
             $isActive = "1";
 
+            $suppliersData = savedSuppliers::all();
+          $capturedSuppliers= capturedsuppliers::all();
+
             $data = DB::table('school_suppliyer')
                 ->join('suppliyer', 'school_suppliyer.Suppliyer_id', '=', 'suppliyer.Id')
-                ->select('school_suppliyer.*', 'suppliyer.email', 'suppliyer.CompanyName', 'suppliyer.CompanyAddress', 'suppliyer.CompanyContact', 'suppliyer.ISActive', 'suppliyer.Date')
+                ->select('school_suppliyer.*', 'school_suppliyer.Suppliyer_id','suppliyer.email', 'suppliyer.CompanyName', 'suppliyer.CompanyAddress', 'suppliyer.CompanyContact', 'suppliyer.ISActive', 'suppliyer.Date')
                 ->where('school_suppliyer.Emis', $emis)
                 ->where('school_suppliyer.IsActive', $isActive)
                 ->paginate(10);
 
-            return view('furniture.Suppliyer.list', compact('data'));
+
+                
+
+            return view('furniture.Suppliyer.list', compact('data','suppliersData', 'capturedSuppliers'));
         }
     }
 
@@ -63,7 +71,36 @@ class SuppliyerController extends Controller
         return view('furniture.Suppliyer.add');
     }
 
-
+    public function downloadQuoteSupplier($supplierID)
+    {
+ 
+        $emis = Auth::user()->username;
+        $savedSupplierID = savedSuppliers::where('supplierID', $supplierID)->where('emis', $emis)->value('id');
+ 
+        $filename = capturedsuppliers::where('savedSupplierID',  $savedSupplierID )->value('quoteForm');
+ 
+        // Load the PDF from the public path
+        $pdfPath = 'public/suppliers/quotes/' . $filename;
+ 
+ 
+        // Download the PDF
+        return response()->download($pdfPath, $filename);
+    }
+ 
+    public function downloadSBD4Supplier($supplierID)
+    {
+ 
+        $emis = Auth::user()->username;
+        $savedSupplierID = savedSuppliers::where('supplierID', $supplierID)->where('emis', $emis)->value('id');
+        $filename = capturedsuppliers::where('savedSupplierID',  $savedSupplierID)->value('sbd4Form');
+ 
+        // Load the PDF from the public path
+        $pdfPath = 'public/suppliers/sbd4/' . $filename;
+ 
+ 
+        // Download the PDF
+        return response()->download($pdfPath, $filename);
+    }
 
     public function AddSuppliyer(Request $request)
     {
@@ -73,7 +110,7 @@ class SuppliyerController extends Controller
 
             $isActive = "1";
 
-            //    //INSERT INTO `suppliyer`(`Id`, `email`, `CompanyName`, `CompanyAddress`, `CompanyContact`, `ISActive`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
+            //    //INSERT INTO suppliyer(Id, email, CompanyName, CompanyAddress, CompanyContact, ISActive) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
             $SuppliyerData =  [
                 'email' => $request->input('Email'),
                 'CompanyName' => $request->input('CompanyName'),
@@ -128,7 +165,7 @@ class SuppliyerController extends Controller
 
 
 
-                    //INSERT INTO `logsactivity`(`Id`, `DescriptionActivities`, `Who`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
+                    //INSERT INTO logsactivity(Id, DescriptionActivities, Who, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
                     $SchoolName = DB::connection('itrfurns')->table('schools')
                         ->where('emis', $emis)
                         ->value('name');
@@ -150,7 +187,7 @@ class SuppliyerController extends Controller
                 $isActive = "1";
 
 
-                //    //INSERT INTO `suppliyer`(`Id`, `email`, `CompanyName`, `CompanyAddress`, `CompanyContact`, `ISActive`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
+                //    //INSERT INTO suppliyer(Id, email, CompanyName, CompanyAddress, CompanyContact, ISActive) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
                 $SuppliyerData =  [
                     'email' => $request->input('Email'),
                     'CompanyName' => $request->input('CompanyName'),
@@ -159,7 +196,7 @@ class SuppliyerController extends Controller
                     'ISActive' => $isActive
                 ];
 
-                //INSERT INTO `logsactivity`(`Id`, `DescriptionActivities`, `Who`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
+                //INSERT INTO logsactivity(Id, DescriptionActivities, Who, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
                 $SchoolName = DB::connection('itrfurns')->table('schools')
                     ->where('emis', $emis)
                     ->value('name');
@@ -181,8 +218,8 @@ class SuppliyerController extends Controller
 
                 $NewIsActive = "1";
                 $SuppliyerId = DB::table('suppliyer')->insertGetId($SuppliyerData);
-                //INSERT INTO `school_suppliyer`(`Id`, `Suppliyer_id`, `Emis`, `email`, `CompanyName`, `CompanyAddress`, `CompanyContact`, `IsActive`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]')
-                //INSERT INTO `school_suppliyer`(`Id`, `Suppliyer_id`, `Emis`, `IsActive`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
+                //INSERT INTO school_suppliyer(Id, Suppliyer_id, Emis, email, CompanyName, CompanyAddress, CompanyContact, IsActive, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]')
+                //INSERT INTO school_suppliyer(Id, Suppliyer_id, Emis, IsActive, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
                 $SchoolSuppliyer = [
                     'Suppliyer_id' => $SuppliyerId,
                     'Emis' => $SchoolEmis,
@@ -217,7 +254,7 @@ class SuppliyerController extends Controller
         $emis = Auth::user()->username;
 
         if ($emis === "Admin") {
-            //INSERT INTO `school_suppliyer`(`Id`, `Suppliyer_id`, `Emis`, `email`, `CompanyName`, `CompanyAddress`, `CompanyContact`, `IsActive`, `Date`, `updated_at`, `created_at`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]','[value-11]')
+            //INSERT INTO school_suppliyer(Id, Suppliyer_id, Emis, email, CompanyName, CompanyAddress, CompanyContact, IsActive, Date, updated_at, created_at) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]','[value-11]')
             $ID = $request->input('IDVAl');
             $CompanyName = $request->input('CompanyName');
             $Email = $request->input('Email');
@@ -249,7 +286,7 @@ class SuppliyerController extends Controller
 
             return redirect()->route('Suppliyer.list')->with('successD', 'Supplier updated successfully');
         } else {
-            //INSERT INTO `school_suppliyer`(`Id`, `Suppliyer_id`, `Emis`, `email`, `CompanyName`, `CompanyAddress`, `CompanyContact`, `IsActive`, `Date`, `updated_at`, `created_at`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]','[value-11]')
+            //INSERT INTO school_suppliyer(Id, Suppliyer_id, Emis, email, CompanyName, CompanyAddress, CompanyContact, IsActive, Date, updated_at, created_at) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]','[value-11]')
             $ID = $request->input('IDVAl');
             $CompanyName = $request->input('CompanyName');
             $Email = $request->input('Email');
@@ -267,7 +304,7 @@ class SuppliyerController extends Controller
                     'CompanyContact' => $CompanyContact,
                 ]);
 
-            //INSERT INTO `logsactivity`(`Id`, `DescriptionActivities`, `Who`, `Date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
+            //INSERT INTO logsactivity(Id, DescriptionActivities, Who, Date) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]')
             $SchoolName = DB::connection('itrfurns')->table('schools')
                 ->where('emis', $emis)
                 ->value('name');
@@ -349,4 +386,5 @@ class SuppliyerController extends Controller
 
         return view('furniture.Suppliyer.list', compact('data'));
     }
+
 }

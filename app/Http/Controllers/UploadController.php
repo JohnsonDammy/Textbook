@@ -187,13 +187,12 @@ public function MarkAsRead(Request $request){
 }
 
 public function DeleteMessage(Request $request){
-  $id = $request->input('del');
+  $id = $request->input('delNotification');
 
   DB::table('inbox')
   ->where('Id', $id)
-
   ->update([
-      'DelVal' => "1",
+      'DelVal' => "0",
 
   ]);
 

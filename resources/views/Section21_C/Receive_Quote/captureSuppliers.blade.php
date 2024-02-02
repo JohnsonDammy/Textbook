@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'History Requests')
+@section('title', 'Capture Supplier')
 @section('content')
     <style>
         /* Style for the tab links */
@@ -63,10 +63,6 @@
                                     href="{{ route('stationeryCat', ['requestType' => 'Stationery', 'idInbox' => 2]) }}">View
                                     Items</a></li>
                             @endif
-
-
-
-
                             </li>
                             <li class="breadcrumb-item"><a href="{{ route('inboxSchool') }}">Inbox</a></li>
                         </ol>
@@ -83,9 +79,9 @@
     <br><br>
      <center>
         <h3> Capture Supplier Details </h3>
-        <div class="card" style="background-color: white; width:700px;">
-        <div class="card-body"   >
-            <form action="{{ route('CaptureSuppliers') }}" method="post" enctype="multipart/form-data"  onsubmit="setInProgress()">
+        <div class="card" style="background-color: white; width:900px;">
+        <div class="card-body">
+            <form action="{{ route('CaptureSuppliers') }}" method="post" enctype="multipart/form-data"  onsubmit="showLoadingModal()">
                 @csrf
                 <input type="hidden" id="hiddenFieldValue" name="hiddenFieldValue" value="">
 
@@ -123,31 +119,16 @@
                             <p  class="form-control"  style="text-align: left"> {{  capturedsuppliers::where('savedSupplierID', $itemId)->value('sbd4Form') }} <p>
                         @else
                             <label for="firstName">Upload SBD 4 Form:</label>
-                            <input type="file" class="form-control" name="fileSBD4" id="fileDisclosureInput">
+                            <input type="file" class="form-control" name="fileSBD4" id="fileDisclosureInput" required>
                         @endif
                     @else
                     <label for="firstName">Upload SBD 4 Form:</label>
-                            <input type="file" class="form-control" name="fileSBD4" id="fileDisclosureInput">
+                            <input type="file" class="form-control" name="fileSBD4" id="fileDisclosureInput" required>
                     @endif
 
                 </div>
 
 
-                <div class="form-group">
-                    @if ($existRecord) 
-                        @if (capturedsuppliers::where('savedSupplierID', $itemId)->value('disclosureForm') != null && capturedsuppliers::where('savedSupplierID', $itemId)->value('disclosureForm') != "N/A" )
-                            <label for="firstName">Uploaded disclosure Form:</label>
-                            <p  class="form-control"  style="text-align: left"> {{  capturedsuppliers::where('savedSupplierID', $itemId)->value('disclosureForm') }} <p>
-                        @else
-                            <label for="firstName">Upload Disclosure Form:</label>
-                            <input type="file" class="form-control" name="fileDisclosure" id="fileDisclosureInput">
-                        @endif
-                    @else
-                    <label for="firstName">Upload Disclosure Form:</label>
-                    <input type="file" class="form-control" name="fileDisclosure" id="fileDisclosureInput">
-                    @endif
-
-                </div>
 
 
                 <div class="form-group">
@@ -157,11 +138,11 @@
                             <p  class="form-control"  style="text-align: left"> {{  capturedsuppliers::where('savedSupplierID', $itemId)->value('taxClearanceForm') }} <p>
                         @else
                             <label for="firstName">Upload Tax Clearance Form:</label>
-                            <input type="file" class="form-control" name="fileTax" id="fileDisclosureInput">
+                            <input type="file" class="form-control" name="fileTax" id="fileDisclosureInput" required>
                         @endif
                     @else
                     <label for="firstName">Upload Tax Clearance Form:</label>
-                    <input type="file" class="form-control" name="fileTax" id="fileDisclosureInput">
+                    <input type="file" class="form-control" name="fileTax" id="fileDisclosureInput" required>
                     @endif
 
                 </div>
@@ -169,15 +150,15 @@
                 @if(session('requestType')=="Textbook")
                 <div class="form-group">
                     <label for="firstName">Mark Up % :</label>
-                    <input type="text" class="form-control" name="markUp"  required
-                        @if ($existRecord) value="{{ capturedsuppliers::where('savedSupplierID', $itemId)->value('markUp') }}" @endif>
+                    <input type="number" class="form-control" name="markUp"  required
+                        @if ($existRecord) value="{{ capturedsuppliers::where('savedSupplierID', $itemId)->value('markUp') }}" @endif step="any">
                 </div>
                 @elseif(session('requestType')=="Stationery")
 
                 <div class="form-group">
                     <label for="firstName">Amount :</label>
-                    <input type="text" class="form-control" name="amtCaptured" id="fileDisclosureInput" required
-                        @if ($existRecord) value="{{ capturedsuppliers::where('savedSupplierID', $itemId)->value('amount') }}" @endif>
+                    <input type="number" class="form-control" name="amtCaptured" id="fileDisclosureInput" required
+                        @if ($existRecord) value="{{ capturedsuppliers::where('savedSupplierID', $itemId)->value('amount') }}" @endif step="any">
                 </div>
                 @endif
 
@@ -229,7 +210,7 @@
 
         <div class="modal-footer justify-content-center">
             <!-- Add space between buttons -->
-            <button type="submit" class="btn btn-primary">SAVE</button>
+            <button type="submit" id="yesBtnModel" class="btn btn-lg btn-primary">SAVE</button>
         </div>
         </form>
 
@@ -237,8 +218,55 @@
     </div>
 </center>
 
+<div class="modal fade" id="ModelLoading" tabindex="-1" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered popup-alert">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="spinner-container" id="spinner">
+                <div class="spinner-border text-primary" role="status">
+                </div>
+                <label> Please wait... </label>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+</div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
         </div>
   {{-- Radio buttons within the model --}}
+
+
+{{-- 
+  <script>
+    $(document).ready(function() {
+        $("#yesBtnModel").click(function(){
+        $('#ModelLoading').modal('show');
+
+        })
+
+    
+    });
+
+
+    
+</script> --}}
+
+
+<script>
+    function showLoadingModal() {
+        $('#ModelLoading').modal('show');
+    }
+</script>
   <script>
     // Add an event listener to the radio buttons
     document.getElementById('taxRadio1').addEventListener('change', function() {
@@ -258,4 +286,4 @@
 
 
 
-    @endsection
+    @endsection

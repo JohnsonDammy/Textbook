@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'History Requests')
+@section('title', 'Manage Stationery Catalogue')
 @section('content')
     <main>
 
@@ -107,13 +107,18 @@
                 padding-right: 0;
                 /* Adjust as needed */
             }
+
+            .tableNew{
+                width: 90%;
+
+            }
         </style>
         <div class="container">
             <!-- breadcrumb -->
             <div class="row align-items-center border-bottom border-2">
                 <div class="col-12 col-md-4">
                     <div class="page-titles">
-                        <h4>Manage Funding</h4>
+                        <h4>Manage Catologue</h4>
                         <ol class="breadcrumb">
 
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
@@ -201,6 +206,11 @@
                                     <input type="submit" class="btn btn-primary w-100"
                                         @if (session('quoteStatus') == 'Quote Created') disabled @endif value="Search">
                                 </div>
+                                
+                                <div class="offset-xl-3 col-12 col-md-4 col-xl-2 mb-3">
+                                    <a href="{{ route('StationeryAddNew') }}" class="btn btn-primary w-100">+ Add New Stationery</a>
+                                </div>
+
                             </div>
                         </form>
 
@@ -222,14 +232,16 @@
                             <input type="hidden" name="UncheckedItems" value="">
 
                             <div>
-                                <table class="table">
+                                <div class="row justify-content-center">
+                                <table class="table tableNew">
+                                    
                                     <thead>
                                         <tr>
 
                                             <th> </th>
-                                            <th> Code </th>
+                                            {{-- <th> Code </th> --}}
                                             <th> Name </th>
-                                            <th> Unit Price</th>
+                                            {{-- <th> Unit Price</th> --}}
                                             <th> Quantity </th>
 
 
@@ -261,14 +273,12 @@
 
 
                                                     </td>
-                                                    <td> {{ $item->ItemCode }} </td>
-                                                    <td class="col-md-4">
-                                                        <div class="short-text" title="{{ $item->Item }}">
-                                                            {{ Str::limit($item->Item, 40) }}
-                                                        </div>
+                                                    {{-- <td> {{ $item->ItemCode }} </td> --}}
+                                                    <td>
+                                                        {{ $item->Item }}
 
                                                     </td>
-                                                    <td>100,00</td>
+                                                    {{-- <td>100,00</td> --}}
 
                                                     <td>
 
@@ -300,6 +310,7 @@
                                         </tbody>
 
                                 </table>
+                            </div>
                                 <style>
                                     .pagination-wrap a {
                                         margin-right: -70px;
@@ -398,9 +409,9 @@
 
                                             <th> Code </th>
                                             <th>Title</th>
-                                            <th>Price</th>
+                                            {{-- <th>Price</th> --}}
                                             <th>Quantity</th>
-                                            <th>Total Price</th>
+                                            {{-- <th>Total Price</th> --}}
 
                                             @if (session('quoteStatus') != 'Quote Created')
                                             <th> Action </th>
@@ -423,21 +434,22 @@
 
                                                     <td> {{ $item->item_code }} </td>
                                                     <td> {{ $item->item_title }} </td>
-                                                    <td> {{ $item->price }} </td>
+                                                    {{-- <td> {{ $item->price }} </td> --}}
                                                     <td> {{ $item->Quantity }} </td>
                                                     @php
                                                         $TotalAccumalated = $TotalAccumalated + $item->TotalPrice;
                                                     @endphp
-                                                    <td> R {{ number_format($item->TotalPrice, 2, '.', ',') }} </td>
+                                                    {{-- <td> R {{ number_format($item->TotalPrice, 2, '.', ',') }} </td> --}}
 
                                                     @if (session('quoteStatus') != 'Quote Created')
                                                     <td>
                                                         <form
-                                                            action="{{ route('StationeryItemDelete', ['deleteId' => $item->id]) }} "
+                                                            action="{{ route('StationeryItemDelete')}}"
                                                             method="POST">
-                                                            <input type="hidden" name="_method" value="DELETE">
-                                                            <input type="hidden" name="_token"
-                                                                value="{{ csrf_token() }}">
+                                                          @csrf
+
+                                                                <input type="hidden" name="DelID" value="{{$item->Id}}">
+
 
                                                             <button class="btn-reset"
                                                                 @if (session('quoteStatus') == 'Quote Created') disabled @endif
@@ -475,7 +487,7 @@
                                                     <th>Status</th>
                                                     @endif
                                                     <th>Number Of Pages</th>
-                                                    <th>Total </th>
+                                                    {{-- <th>Total </th> --}}
 
                                                     @if (session('quoteStatus') != 'Quote Created')
                                                     <th>Delete</th>
@@ -488,9 +500,12 @@
                                                 <tr class="pt-1 px-1">
                                                     @if (session('quoteStatus') != 'Quote Created')
                                                     <td>
+                                                        <small style="color: red; display:none;" id="ShowError"> Please generate quote</small><br>
+
                                                         <form action=" {{ route('generateQuoteStationery') }} "
                                                             method="post" onsubmit="setInProgress()">
                                                             @csrf
+
                                                             <input type="hidden" name="orderedAmount" value="{{ $TotalAccumalated  }}">
                                                             <input type="submit" class="buttonGenerate"
                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal"
@@ -498,21 +513,22 @@
                                                                 value="Generate Quote">
                                                         </form>
 
-
-
-
                                                         <!-- Progress Bar -->
 
                                                     </td>
                                                     @endif
 
                                                     <td>
-                                                        <a href="{{ route('viewQuotesStats') }}" target="_blank"
+                                                        <small id="DownloadQuote" style="color:red; display:none;">Next download Quote</small><br>
+                                                        <a id="viewQuoteLink" href="{{ route('viewQuotesStats') }}" target="_blank"
                                                             style="color: @if (session('quoteStatus') == 'Quote Created' || session('status') == 'Generated') green @else grey @endif;
                                                           text-decoration: underline; font-style: italic;
                                                           @if (session('quoteStatus') != 'Quote Created' && session('status') != 'Generated') pointer-events: none; @endif">
                                                             View Quotes
                                                         </a>
+
+                                                        <input type="hidden" id="myTextbox" name="myTextbox" value="">
+
 
 
                                                     </td>
@@ -545,10 +561,10 @@
                                                     </td>
 
 
-                                                    <td class="col-md"
+                                                    {{-- <td class="col-md"
                                                         style="color: {{ $TotalAccumalated > session('AllocatedAmt') ? 'red' : 'green' }}">
                                                         R {{ number_format($TotalAccumalated, 2, '.', ',') }}
-                                                    </td>
+                                                    </td> --}}
 
                                                     @if (session('quoteStatus') != 'Quote Created')
                                                     <td>
@@ -603,8 +619,8 @@
                                         @csrf
 
                                         <button @if (session('quoteStatus') == 'Quote Created' || count($dataSavedStationery) < 1) disabled @endif
-                                            class="btn btn-primary btn-sm" id="sumitbuttton" type="button"
-                                            data-bs-toggle="modal" data-bs-target="#exampleModal5">
+                                            class="btn btn-primary btn-sm" id="sumitbutttonsss" type="button"
+                                        >
                                             SUMBIT
                                         </button>
 
@@ -638,9 +654,60 @@
                     </div>
                 </div>
             </div>
+            @if ($message = Session::get('success'))
+            <div class="modal fade show" id="exampleModalBlud" tabindex="-1" aria-labelledby="exampleModalLabel"
+                style="display: block;" aria-modal="true" role="dialog">
+                <div class="modal-dialog modal-dialog-centered popup-alert">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <img src="{{ asset('img/popup-check.svg') }}" class="img-fluid mb-5" alt="">
+                                <h4 class="popup-alert_title">{{ $message }}</h4>
+                                {{-- <p class="popup-alert_des">{{ $message }}</p> --}}
+                            </div>
+
+                        </div>
+                        <div class="modal-footer text-center justify-content-center p-3 border-0">
+                            <button type="button" class="btn btn-secondary px-5" data-bs-dismiss="modal"
+                                onclick="hidePopup()">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          @endif
+
+
+
+
+          @if ($message = Session::get('errorMessage1'))
+          <div class="modal fade show" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: block;" aria-modal="true" role="dialog">
+              <div class="modal-dialog modal-dialog-centered popup-alert">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <div class="text-center">
+                              <img src="{{ asset('img/Error-Text.svg') }}" class="img-fluid mb-5" alt="">
+                              <h4 class="popup-alert_title">{{ $message }}</h4>
+                              {{-- <p class="popup-alert_des">{{ $message }}</p> --}}
+                          </div>
+
+                      </div>
+                      <div class="modal-footer justify-content-around text-center">
+                          <button type="button" class="btn btn-secondary px-5" data-bs-dismiss="modal" onclick="hidePopup()">OK</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          @endif
+
         </div>
 
-
+        <script>
+            function hidePopup() {
+                $("#exampleModalBlud").fadeOut(200);
+                $('.modal-backdrop').remove();
+                console.log("hidePop")
+            }
+        </script>
         <script>
             function validateInput(input) {
 
@@ -657,6 +724,38 @@
 
             }
         </script>
+
+        
+<script>
+    $(document).ready(function() {
+    
+        $("#viewQuoteLink").click(function(e) {
+      
+            $("#myTextbox").val("2");
+        });
+    
+        $("#sumitbutttonsss").click(function() {
+            @if (session('status') == null)
+                document.getElementById('ShowError').style.display = 'block';
+                $('#ShowError').focus();
+            @elseif(session('status') == 'Generated')
+                // Check if the "View Quote" link has been clicked
+                if (!localStorage.getItem('viewQuoteClicked')) {
+                    $('#DownloadQuote').css('display', 'inline');
+                } else {
+                   // $('#exampleModal5').modal('show');
+                }
+            @endif
+    
+    
+            if($("#myTextbox").val() == "2"){
+                $('#exampleModal5').modal('show');       
+             }
+        });
+    });
+    
+    </script>
+    
 
         <script>
             function setInProgress() {

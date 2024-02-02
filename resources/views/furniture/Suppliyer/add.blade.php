@@ -62,7 +62,7 @@
             </div>
             @endif
                 <div class="align-items-center">
-                    <form class="" method="post" action="{{ route('AddSuppliyer') }}" data-parsley-validate>
+                    <form class="form-with-modal" method="post" action="{{ route('AddSuppliyer') }}" data-parsley-validate>
                         @csrf()
                         <div class="col-12 col-md-6 col-xl-6">
                             <div class="form-group ">
@@ -102,7 +102,12 @@
 
                         <div class="col-12 col-md-6 col-xl-6">
                             <div class="form-group ">
-                                <input type="number" class="form-control form-control-lg" name="CompanyContact" id="CompanyContact" value="{{ old('CompanyContact') }}" placeholder=" " required>
+                                <input type="number" class="form-control form-control-lg" name="CompanyContact" id="CompanyContact"   pattern="0[0-9]{9}"  value="{{ old('CompanyContact') }}" placeholder="Enter a valid contact number eg. 0839356789" title="Please enter a valid South African phone number starting with 0 and total of 10 digits"
+                                
+                                
+                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                maxlength="10"                                
+                                required>
                                 @if($errors->has('CompanyContact'))
                                 <span class="text-danger" role="alert">
                                     <strong>{{ $errors->first('CompanyContact') }}</strong>
@@ -113,21 +118,61 @@
                         </div>
                         <div class="text submit-btn my-4">
                             <button type="reset" class="btn-reset px-4 fs-3 text-decoration-underline" value="Clear">Clear </button>
-                            <input type="submit" class="mx-4  btn btn-lg btn-primary" id="add_circuit" name="add_circuit" data-bs-toggle="modal" data-bs-target="#alret-pop" value="Add">
+                            <input type="submit" class="mx-4  btn btn-lg btn-primary" id="yesBtnModel" name="add_circuit" data-bs-toggle="modal" data-bs-target="#alret-pop" value="Add">
                         </div>
                     </form>
                 </div>
             </div>
 
         </div>
+        <div class="modal fade" id="ModelLoading" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered popup-alert">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="spinner-container" id="spinner">
+                        <div class="spinner-border text-primary" role="status">
+                        </div>
+                        <label> Please wait... </label>
+                    </div>
 
+                </div>
+
+
+            </div>
+
+        </div>
     </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    {{-- <script>
+        $(document).ready(function() {
+            $("#yesBtnModel").click(function(){
+            $('#ModelLoading').modal('show');
+    
+            })
+    
+        
+        });
+    </script> --}}
+    <script>
+        $(document).ready(function() {
+            $(".form-with-modal").submit(function() {
+                // Show the modal when the form is submitted
+                $('#ModelLoading').modal('show');
+            });
+        });
+    </script>
+
+
     @if ($message = Session::get('error'))
     <div class="modal-backdrop fade show" onclick="hidePopup()"></div>
     @endif
     <script>
         function hidePopup() {
-            $("#exampleModal").fadeOut(200);
+            $("#ModelLoading").fadeOut(200);
             $('.modal-backdrop').remove();
             console.log("hidePop")
         }

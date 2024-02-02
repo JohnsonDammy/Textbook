@@ -1,6 +1,9 @@
 @extends('layouts.layout')
-@section('title', 'History Requests')
+
+@section('title', 'Quote Received')
 @section('content')
+
+
     <style>
         /* Style for the tab links */
         .tab-link {
@@ -38,6 +41,9 @@
             background-color: #14A44D;
             /* Darker blue on hover for the active tab */
         }
+
+
+        
     </style>
     <main>
         <link href="path/to/bootstrap-datepicker.min.css" rel="stylesheet">
@@ -54,7 +60,7 @@
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                             <li class="breadcrumb-item active"><a href="#"> Receive Quotes </a>
-                        
+
 
 
 
@@ -143,47 +149,52 @@
                     <div class="tab-content " data-toggle="1" id="tab1">
 
 
+                   
+
                         <form id="submitForm" action="{{ route('submitSuppliers') }}" method="POST">
                             @csrf
 
 
                             <br>
-                          {{--   @if (session('statusComment') == '') --}}
-                                <div class="card" id="minQuotesSelection">
-                                    <h5 class="card-header" style =" color:#14A44D">Received Minimum Quotes ? </h5>
-                                    <div class="card-body">
-                                        <div class="container mt-2">
-                                            <div class="row">
+                            {{--   @if (session('statusComment') == '') --}}
+                            <div class="card" id="minQuotesSelection">
+                                <h5 class="card-header" style =" color:#14A44D">Received Minimum Quotes ? </h5>
+                                <div class="card-body">
+                                    <div class="container mt-2">
+                                        <div class="row">
 
-                                                <input type="hidden" name="isReceivedMinimumQuotes" id="hiddenField"
-                                                    value="">
+                                            <input type="hidden" name="isReceivedMinimumQuotes" id="hiddenField"
+                                                value="">
 
-                                                <div class="col-md-3">
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="inlineRadioOptions"
-                                                            @if (session('isReceivedMinimumQuotes') == 'true') checked @endif
-                                                            id="inlineRadio1" value="option1">
-                                                        <label class="form-check-label" for="inlineRadio1">Yes</label>
-                                                    </div>
+                                            <div class="col-md-3">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions"
+                                                        @if (session('isReceivedMinimumQuotes') == 'true') checked @endif id="inlineRadio1"
+                                                        value="option1">
+                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                </div>
 
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="inlineRadioOptions"
-                                                            @if (session('isReceivedMinimumQuotes') == 'false') checked @endif
-                                                            id="inlineRadio2" value="option2">
-                                                        <label class="form-check-label" for="inlineRadio2">No</label>
-                                                    </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio"
+                                                        name="inlineRadioOptions"
+                                                        @if (session('isReceivedMinimumQuotes') == 'false') checked @endif id="inlineRadio2"
+                                                        value="option2">
+                                                    <label class="form-check-label" for="inlineRadio2">No</label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                      {{--       @endif --}}
+                            </div>
+                            {{--       @endif --}}
+                            <br>
+                            @if (session('statusCommentNew') != '')
+                            <center>    <span style="font-weight: bold; color: red;"> Rework Reason : {{ session('statusCommentNew') }}</span></center>
+                            @endif
+                            <br>
 
                             <div class="card" id="cardSupplier" style="display:none">
                                 <h5 class="card-header" style ="color:#14A44D">Capture Supplier Details</h5>
-                                <div class="card-body">
 
                                     <table class="table">
                                         <input type="hidden" name="UncheckedItems" value="">
@@ -196,7 +207,9 @@
                                                 <th>Address</th>
                                                 <th>Contact No</th>
                                                 <th> Amount </th>
-                                                <th> Mark up (%) </th>
+                                                @if ($requestType === "Textbook")
+                                                <th> Mark Up (%) </th>
+                                                @endif
                                                 <th> Action </th>
 
 
@@ -237,7 +250,8 @@
                                                         </td>
 
                                                         <td>{{ $item->CompanyContact }} </td>
-
+                                                        
+                                                        @if ($requestType === "Textbook")
                                                         <td>
                                                             @if (session('supplierCaptured')->contains('savedSupplierID', $item->id))
                                                                 @php
@@ -262,6 +276,7 @@
                                                                 N/A
                                                             @endif
                                                         </td>
+                                                     
 
                                                         <td>
 
@@ -275,10 +290,26 @@
                                                             @else
                                                                 N/A
                                                             @endif
-
-
-
                                                         </td>
+
+                                                        @else
+                                                        <td>
+                                                      
+                                                            @if (session('supplierCaptured')->contains('savedSupplierID', $item->id))
+                                                            @php
+                                                                $capturedSupplier = session('supplierCaptured')
+                                                                    ->where('savedSupplierID', $item->id)
+                                                                    ->first();
+                                                            @endphp
+                                                            {{-- {{ $capturedSupplier->amount }} --}}
+                                                            R {{ number_format($capturedSupplier->amount, 2, '.', ',') }}
+
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                        </td>
+
+                                                        @endif
 
 
                                                         <td> <a href="{{ route('captureSuppliersPage', ['itemId' => $item->id]) }}"
@@ -288,7 +319,6 @@
                                                                 @else
                                                                     Capture
                                                                 @endif
-                                </div>
                                 </a>
                                 </td>
 
@@ -310,13 +340,17 @@
 
 
                                 </table>
-                            </div>
-                    </div>
-                    <center>
-                        <input type="hidden" name="isSubmit" id="isSubmit" value="">
-                        <input type="submit" style="width:150px" class="btn btn-primary " name="submitBtn"
+                           
+                     
+                        </div>
+<center>
+                            <input type="hidden" name="isSubmit" id="isSubmit" value="">
+                            <input type="submit" id="submitbtn" style="width:150px; " class="btn btn-primary"  name="submitBtn"
                             value="SUBMIT" onclick="setIsSubmitted()">
-                    </center>
+                </center>
+
+                    </div>
+                
 
 
                     </form>
@@ -327,337 +361,289 @@
                 <div class="tab-content" data-toggle="3" id="tab3">
                     <br>
                     @if (session('statusComment') != '')
-                        <p style="font-weight: bold; color: red;"> Declined Reason :  {{ session('statusComment') }}</p>
+                        <p style="font-weight: bold; color: red;"> Declined Reason : {{ session('statusComment') }}</p>
                     @endif
                     <div class="card" id="cardSupplier">
                         <h5 class="card-header" style ="color:#14A44D">Recommend Captured Suppliers</h5>
-                        <div class="card-body">
 
 
-                            <form id="submitEF48" action="{{ route('updateRecommended') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-
-                                <table class="table">
-                                    <input type="hidden" name="UncheckedItems" value="">
-                                    <thead>
-                                        <tr>
-
-                                            {{--  <th> </th> --}}
-                                            <th> Email </th>
-                                            <th>Name</th>
-                                            <th>Address</th>
-                                            <th>Contact No</th>
-                                            <th> Amount </th>
-                                            <th> Mark up (%) </th>
-                                            <th> Recommend </th>
+                        <form id="submitEF48" action="{{ route('updateRecommended') }}" method="POST"
+                            enctype="multipart/form-data"  onsubmit="showLoadingModal()">
+                            @csrf
 
 
+                            <meta name="csrf-token" content="{{ csrf_token() }}">
+
+                            <div class="table">
+                            <table class="table NewTable">
+                                <input type="hidden" name="UncheckedItems" value="">
+                                <thead>
+                                    <tr>
+
+                                        {{--  <th> </th> --}}
+                                        <th> Email </th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Contact No</th>
+                                        <th> Amount </th>
+                                        @if ($requestType === "Textbook")
+                                         <th> Mark Up (%) </th>
+                                        @endif
+
+                                        <th> Recommend </th>
 
 
+
+
+                                    </tr>
+                                </thead>
+
+                                @if (count(session('CapturedData')) < 1)
+                                    <tbody>
+
+                                        <tr class="text-center text-dark">
+                                            <td colspan="9">Please capture minumum of three suppliers
+                                            </td>
                                         </tr>
-                                    </thead>
+                                    </tbody>
+                                @else
+                                    <tbody>
+                                        @foreach (session('CapturedData') as $item)
+                      
+                                            <tr>
 
-                                    @if (count(session('CapturedData')) < 1)
-                                        <tbody>
+                                        
 
-                                            <tr class="text-center text-dark">
-                                                <td colspan="9">Please capture minumum of three suppliers
+                                                <td>{{ $item->email }} </td>
+                                                <td>{{ $item->CompanyName }} </td>
+                                                <td>
+                                                    <div class="short-text" title="{{ $item->CompanyAddress }} ">
+                                                        {{ Str::limit($item->CompanyAddress, 40) }}
+                                                    </div>
                                                 </td>
-                                            </tr>
-                                        </tbody>
-                                    @else
-                                        <tbody>
-                                            @foreach (session('CapturedData') as $item)
-                                                {{--  @php
-                                                use App\Models\capturedsuppliers;
 
-                                                $existRecord = capturedsuppliers::where('savedSupplierID', $item->id)->exists();
-                                            @endphp --}}
-                                                <tr>
+                                                <td>{{ $item->CompanyContact }} </td>
 
-                                                    {{--  <td> <input type="checkbox" class="checkbox" name="selectedItems[]"
-                                                    @if (session('savedSuppliers')->contains('supplierID', $item->Id)) checked @endif
-                                                    value={{ $item->Id }}>
-                                            </td> --}}
-
-                                                    <td>{{ $item->email }} </td>
-                                                    <td>{{ $item->CompanyName }} </td>
+                                                @if ($requestType === "Textbook")
                                                     <td>
-                                                        <div class="short-text" title="{{ $item->CompanyAddress }} ">
-                                                            {{ Str::limit($item->CompanyAddress, 40) }}
-                                                        </div>
-                                                    </td>
-
-                                                    <td>{{ $item->CompanyContact }} </td>
-
-                                                    <td>
-
-
                                                         @if ($item->markUp > 27)
                                                             <span style="color:red">R
                                                                 {{ number_format($item->amount, 2, '.', ',') }}</span>
+                                                                <input type="hidden" id="hiddenInputVal" value="{{ number_format($item->amount, 2, '.', ',') }}">
+
                                                         @else
                                                             <span style="color:black">R
                                                                 {{ number_format($item->amount, 2, '.', ',') }}</span>
                                                         @endif
 
-
-
                                                     </td>
 
-                                                    <td>
+                                                @else
+                                                <td>
+                                                   R {{ number_format($item->amount, 2, '.', ',') }}
+
+                                                </td>
+
+                                                @endif
+                                         
+
+                                                @if ($requestType === "Textbook")
+                                                <td>
+                                                    {{ $item->markUp }}
+                                                </td>
+                                                @endif
 
 
-                                                        {{ $item->markUp }}
+                                                <td>
+                                                    @php
+                                                        $supplierRecommended = session('CapturedData')
+                                                            ->where('Recommended', 'yes')
+                                                            ->first();
 
-                                                    </td>
+                                                        if ($supplierRecommended != null) {
+                                                            $recommendedIDs = $supplierRecommended->custom_id;
+                                                        }
+                                                    @endphp
+                                                    <input class="form-check-input" type="radio"
+                                                        name="inlineRadioRecommend"
+                                                        @if ($supplierRecommended != null) @if ($recommendedIDs == $item->custom_id) checked @endif
+                                                        @endif
+                                                    id="inlineRadio{{ $item->custom_id }}"
+                                                    value="{{ $item->custom_id }}"
+                                                    onclick="updateHiddenInput(this, {{ $item->markUp }})">
+                                                    <label class="form-check-label"
+                                                        for="inlineRadioRecommend">Select</label>
+                                                </td>
 
+                                            </tr>
+                                        @endforeach
+                                @endif
 
-                                                    <td>
-                                                        @php
-                                                            $supplierRecommended = session('CapturedData')
-                                                                ->where('Recommended', 'yes')
-                                                                ->first();
-
-                                                            if ($supplierRecommended != null) {
-                                                                $recommendedIDs = $supplierRecommended->custom_id;
-                                                            }
-                                                        @endphp
-                                                        <input class="form-check-input" type="radio"
-                                                            name="inlineRadioRecommend"
-                                                            @if ($supplierRecommended != null) @if ($recommendedIDs == $item->custom_id) checked @endif
-                                                            @endif
-                                                        id="inlineRadio{{ $item->custom_id }}"
-                                                        value="{{ $item->custom_id }}"
-                                                        onclick="updateHiddenInput(this)">
-                                                        <label class="form-check-label"
-                                                            for="inlineRadioRecommend">Select</label>
-                                                    </td>
-
-                                                </tr>
-                                            @endforeach
-                                    @endif
+                                </tbody>
 
 
-
-                                    </tbody>
-
-
-                                </table>
-
-                                {{-- Download and upload ef48 --}}
-                                {{-- Download and upload comittee PDF  --}}
-
-
-
-                        </div>
-                    </div>
-
-                    <div class="card" id="cardRecommended">
-                        <h5 class="card-header" style ="color:#14A44D">EF58 Download and Upload</h5>
-                        <div class="card-body">
-                            <div class="row align-items-center border-bottom border-2 mx-auto ">
-
-                                <div class="form-group col-12 col-md-6 col-xl-2">
-
-                                    <i class="fas fa-download" style="color: green;"></i><a
-                                        href="{{ route('downloadEF58') }}"
-                                        style="color:green; text-decoration: underline; font-style: italic;"
-                                        onclick="enableUploadInput()">
-                                        Download EF58
-                                    </a>
-
-                                </div>
-
-
-                                <div class="form-group col-12 col-xl-4 col-xl-2">
-                                    <div class="row justify-content-center ">
-                                        <div class="col-md-4 form-control" style="width: 100%;" class="form-control">
-                                            <label for="reference-number">Upload EF58 Form</label>
-                                            <div class="input-group">
-                                                <input type="file" name="fileEF48" id="fileEF48" required
-                                                    value="" required disabled>
-                                            </div>
-
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <center>
-                        <input type="hidden" name="recommendedID" id="recommendedID" value="">
-                        <input type="hidden" name="isSubmitRecommend" id="isSubmitRecommend" value="">
-                        <input type="submit" style="width:150px" class="btn btn-primary " id="btnSubK" name="submitBtn"
-                            value="SUBMIT" onclick="setIsSubmittedRecommend()" disabled>
-                        </form>
-
-
-                    </center>
-                </div>
-
-
-                         {{-- Sucess email sent --}}
-            <div class="modal fade" id="ModelLoading" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered popup-alert">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="spinner-container" id="spinner">
-                            <div class="spinner-border text-primary" role="status">
-                            </div>
-                            <label> Loading... </label>
+                            </table>
+                            
+                        
+                   
                         </div>
 
-                    </div> 
-
-
-                    </div>
-               
-                </div>
-            </div>
-        </div>
-
-
-
-
+                            {{-- Download and upload ef48 --}}
+                            {{-- Download and upload comittee PDF  --}}
 
         
 
+                    </div>
+               
+
+                @php
+                    $lowestAmount = session('CapturedData')->min('amount');
+                    $supplierRecommended = session('CapturedData')
+                        ->where('Recommended', 'yes')
+                        ->first();
+                    $recommendedAmount = 0;
+                    $MarkUpPrice = 0;
+
+                    if ($supplierRecommended != null) {
+                        $recommendedAmount = $supplierRecommended->amount;
+                        $MarkUpPrice = $supplierRecommended->markUp;
+                    }
+
+                    session(['lowestAmount' => $lowestAmount]);
+                    session(['recommendedAmount' => $recommendedAmount]);
+
+                @endphp
 
 
 
+                @if ($recommendedAmount != 0)
 
-                {{-- Model --}}
-                {{--    <div class="modal fade" id="modelSuppliers" tabindex="-1" role="dialog"
-                            aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered " role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
+                    @if (session('recommendedAmount') != session('lowestAmount'))
+                    <input type="hidden" id="HiddenInputNew" value="{{$MarkUpPrice}}">
+                        <div class="card">
+                            <small id="ShowDeviationReason" style="color:red; display:none;">Please enter a deviation reason </small><br>
+                            <h5 class="card-header" style ="color:#14A44D">Deviation Reason</h5>
 
-
-                                        <!-- Hidden input field in the modal -->
-
-
-                                        <h5 class="modal-title" id="exampleModalLabel">Capture suppliers</h5>
-                                        <button type="button" class="close" data-bs-dismiss="modal"
-                                            aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-
-                                    </div>
-                                    <div class="modal-body">
+                            <div class="card-body">
 
 
+                                <textarea style="white-space: pre-line;" class="form-control" id="deviationR" name="deviationReason"
+                                    placeholder="Enter comment" rows="1" required> </textarea>
 
-                                        <form action="{{ route('CaptureSuppliers') }}" method="post"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <input type="text" id="hiddenFieldValue" name="hiddenFieldValue"
-                                                value="">
+                            </div>
+                        </div>
+                    @endif
+                @endif
 
+                <div class="card" id="cardRecommended">
+                    <h5 class="card-header" style ="color:#14A44D">EF58 Download and Upload</h5>
 
-                                            @php
-                                                use App\Models\capturedsuppliers;
+                    <div class="card-body">
+                        <div class="row align-items-center border-bottom border-2 mx-auto ">
 
-                                                $savedSupplierID = request('hiddenFieldValue');
-                                                $existRecord = capturedsuppliers::where('savedSupplierID', $savedSupplierID)->exists();
-                                            @endphp
+                            <div class="form-group col-12 col-md-6 col-xl-2">
 
-
-                                            <div class="form-group">
-                                                <label for="firstName">Upload Quote Form:</label>
-                                                <input type="file" class="form-control" name="fileQuote"
-                                                    id="fileDisclosureInput" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="firstName">Upload SBD 4 Form:</label>
-                                                <input type="file" class="form-control" name="fileSBD4"
-                                                    id="fileDisclosureInput">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="firstName">Upload Disclosure Form:</label>
-                                                <input type="file" class="form-control" name="fileDisclosure"
-                                                    id="fileDisclosureInput">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="firstName">Upload Tax Clearance Form:</label>
-                                                <input type="file" class="form-control" name="fileTax"
-                                                    id="fileDisclosureInput">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="firstName">Amount :</label>
-                                                <input type="text" class="form-control" name="amtCaptured"
-                                                    id="fileDisclosureInput" required
-                                                    @if ($existRecord) value="{{ capturedsuppliers::where('savedSupplierID', $savedSupplierID)->value('amount') }}" @endif>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="firstName">Comment :</label>
-                                                <textarea class="form-control" id="memo" name="comment" placeholder="Enter comment" rows="2" required>   @if ($existRecord)
-                                                    {{ capturedsuppliers::where('savedSupplierID', $savedSupplierID)->value('comment') }}
-                                                    @endif
-                                                    </textarea>
-                                            </div>
-
-                                            <br>
-                                            <div class="card">
-
-                                                <div class="card-body" style="background-color: #f4f9f4">
-
-                                                    <label for="firstName">Tax Clearance Valid: </label>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="inlineRadioOptions" id="taxRadio1" value="yes">
-                                                        <label class="form-check-label" for="inlineRadio1">Yes</label>
-                                                    </div>
-
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="inlineRadioOptions" id="taxRadio2" value="no">
-                                                        <label class="form-check-label" for="inlineRadio2">No</label>
-                                                    </div>
-
-                                                    <!-- Hidden field to store the selected value -->
-                                                    <input type="hidden" id="taxClearanceHidden"
-                                                        name="taxClearanceHidden">
-
-                                                </div>
+                                <i class="fas fa-download" style="color: green;"></i><a href="javascript:void(0);"
+                                    style="color:green; text-decoration: underline; font-style: italic;"
+                                    onclick="reloadPageAndNavigate('{{ route('downloadEF58') }}')"
+                                    
+                                    >
+                                    Download EF58
+                                </a>
 
 
-                                            </div>
+                                {{-- <i class="fas fa-download" style="color: green;"></i>
+                                <a href="javascript:void(0);" id="downloadLink" style="color:green; text-decoration: underline; font-style: italic;" onclick="reloadPageAndNavigate('{{ route('OrderLetter') }}')" disabled>
+                                    Download Order Form+
+                                </a> --}}
+                            </div>
+
+
+                            <div class="form-group col-12 col-xl-4 col-xl-2">
+                                <div class="row justify-content-center ">
+                                    <div class="col-md-4 form-control" style="width: 100%;" class="form-control">
+                                        <label for="reference-number">Upload EF58 Form</label>
+                                        <div class="input-group">
+                                            <input type="file" name="fileEF48" id="fileEF48"
+                                                onchange="enableUploadInputKop()" value="" required disabled>
+                                        </div>
 
 
                                     </div>
-
-                                    <div class="modal-footer justify-content-center">
-                                        <!-- Add space between buttons -->
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                    </form>
-
                                 </div>
                             </div>
-                        </div> --}}
+
+                        </div>
+                    </div>
+                </div>
+                <center>
+                    <input type="hidden" name="recommendedID" id="recommendedID" value="">
+                    <input type="hidden" name="MarkUp" id="MarkUpID" value="">
+
+                    <input type="hidden" name="isSubmitRecommend" id="isSubmitRecommend" value="">
+                    <input type="submit" style="width:150px" class="btn btn-primary " id="btnSubK" name="submitBtn"
+                        value="SUBMIT" onclick="setIsSubmittedRecommend()" disabled>
+                    </form>
 
 
-
-
-                {{-- SECOND TAB CONTENT --}}
-
+                </center>
             </div>
 
+        </div>
+            {{-- Sucess email sent --}}
+            <div class="modal fade" id="ModelLoading" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered popup-alert">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="spinner-container" id="spinner">
+                                <div class="spinner-border text-primary" role="status">
+                                </div>
+                                <label> Please wait... </label>
+                            </div>
+
+                        </div>
 
 
+                    </div>
 
-            {{--  Model --}}
+                </div>
+            </div>
+        </div>
+
+    
+
+    <div class="modal fade" id="exampleModalK" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered popup-alert">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="text-center">
+                    <img src="{{ asset('img/Error-Text.svg') }}" class="img-fluid mb-5" alt="">
+                    <h4 class="modal-title">You can't proceed, please recommend supplier less than 27%</h4>
+                    <p class="modal-title_des">
+                    </p>
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-around text-center">
+                <button type="button" class="btn btn-secondary px-5" data-bs-dismiss="modal"
+                    onclick="hidePopup()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
         </div>
 
+
+
+
+        {{--  Model --}}
+
+        </div>
+    </form>
         <br>
 
         {{-- Enable upload only once the download is clicked --}}
@@ -665,31 +651,93 @@
             function enableUploadInput() {
                 var uploadInput = document.getElementById('fileEF48');
                 uploadInput.disabled = false;
+            }
+            function enableUploadInputKop() {
+                var fileInput = document.getElementById('fileEF48');
+                if (fileInput.files.length > 0) {
+                    document.getElementById('btnSubK').disabled = false;
+                } else {
+                    document.getElementById('btnSubK').disabled = true;
+                }
+            }
 
-
-            document.getElementById('btnSubK').disabled = false;
-              
-
+            function showLoadingModal(){
+                $('#ModelLoading').modal('show');
             }
         </script>
 
+
+<script>
+    function reloadPageAndNavigate(route) {
+        // Reload the page
+        location.reload();
+
+        // Navigate to the specified route after a short delay (adjust the delay as needed)
+        setTimeout(function() {
+            window.location.href = route;
+        }, 500);  // 500 milliseconds delay, adjust as needed
+
+      //  document.getElementById('btnSub').disabled = false;
+      var uploadInput = document.getElementById('fileEF48');
+                uploadInput.disabled = false;
+
+    }
+</script>
         {{-- Recommend supplier ID retrieve --}}
         <script>
-            function updateHiddenInput(radio) {
+            function updateHiddenInput(radio, markUp) {
                 var hiddenInput = document.getElementById('recommendedID');
                 hiddenInput.value = radio.value;
+
+                var MarkUpIDs = document.getElementById('MarkUpID');
+               MarkUpIDs.value = markUp;
+
+    
+
+             //   console.log('Mark-Up:', markUp);
+
             }
         </script>
 
         {{-- Show and Hide Tabs Dynamically --}}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script>
+
+
+
+                // AJAX request
+        $(document).ready(function() {
+                    // Assuming the input field has an id of "deviationR"
+                    var deviationInput = $("#deviationR");
+
+                    deviationInput.on('input', function() {
+                        // Get the current value of the input field
+                        var deviationReason = deviationInput.val();
+
+                    // Perform the Ajax call when the user finishes entering the reason
+                    $.ajax({
+                        url: '{{ route("updateDeviationReason") }}',
+                        method: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            DeviationR: deviationReason,
+                        },
+                        success: function(response) {
+                            console.log('Data updated successfully:', response);
+                            // You can handle the response here if needed
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+            });
+        });
+
+        </script>
+        
         <script>
             $(document).ready(function() {
-
-
-
-
-
 
                 @if (session('activeTab') != 'tab3')
 
@@ -733,7 +781,6 @@
                     $(this).addClass('active');
 
 
-
                     // Hide all tab content
                     $(".tab-content").hide();
 
@@ -756,11 +803,17 @@
                 const hiddenField = document.getElementById("hiddenField");
                 const minQuotesSelection = document.getElementById("minQuotesSelection");
 
-                @if (session('isReceivedMinimumQuotes') == 'true') 
+                const submitBtn = document.getElementById("submitbtn"); 
 
-                @if (session('statusComment') != '')
-                     minQuotesSelection.style.display = "none";
-                @endif
+             const here = document.getElementById("NewBtnKops");
+
+
+                @if (session('isReceivedMinimumQuotes') == 'true')
+                submitBtn.style.display ="none";
+
+                    @if (session('statusComment') != '')
+                        minQuotesSelection.style.display = "none";
+                    @endif
                     hiddenField.value = "true";
                     tab2.style.display = "block";
                     supplierCard.style.display = "block";
@@ -772,21 +825,28 @@
                     hideRecommendSupplierTab();
                 @endif
 
-               
+
 
                 // Add click event listeners to the radio buttons
                 yesRadio.addEventListener("click", function() {
                     hiddenField.value = "true";
                     tab2.style.display = "block";
+                //    alert('Yes')
                     supplierCard.style.display = "block";
                     showRecommendSupplierTab();
+                    here.style.display = "none";
+
                 });
 
                 noRadio.addEventListener("click", function() {
                     hiddenField.value = "false";
                     tab2.style.display = "none";
+                 //   alert('No')
+
                     supplierCard.style.display = "none";
                     hideRecommendSupplierTab();
+                    here.style.display = "block";
+
                 });
 
                 // Function to hide the recommend supplier tab and the grid
@@ -822,24 +882,28 @@
             </script>
         @endif
 
-        @if (session('OkNowSuccess') == "true")
-        <script>
-            $(document).ready(function() {
-                $('#ModelLoading').modal('hide');
-            });
-        </script>
+        @if (session('OkNowSuccess') == 'true')
+            <script>
+                $(document).ready(function() {
+                    $('#ModelLoading').modal('hide');
+                });
+            </script>
         @endif
 
 
-@if (session('OkNowSuccessAnother') == "true")
-<script>
-    $(document).ready(function() {
-        $('#ModelLoading').modal('hide');
-    });
-</script>
- @endif
+        @if (session('OkNowSuccessAnother') == 'true')
+            <script>
+                $(document).ready(function() {
+                    $('#ModelLoading').modal('hide');
+                });
+            </script>
+        @endif
 
 
+
+        {{-- $(document).ready(function() {
+            // Use hiddenValue in your JavaScript logic
+        }); --}}
 
         <script>
             $(document).ready(function() {
@@ -847,41 +911,58 @@
                 $('input[name="inlineRadioOptions"]').change(function() {
                     // Submit the form when a radio button is changed
                     // document.getElementById('ModelLoading').style.display='block';
+                 //   var hiddenValue = $("#HiddenInputNew").val();
+                    //console.log(hiddenValue)
+
                     $('#ModelLoading').modal('show');
                     event.preventDefault();
-                    $('#submitForm').submit();
+                   $('#submitForm').submit();
+                   console.log(hiddenValue)
+
                 });
             });
         </script>
 
-
+<script>
+    function hidePopup() {
+        $("#exampleModalK").fadeOut(200);
+        $('.modal-backdrop').remove();
+        console.log("hidePop")
+    }
+</script>
         <script>
             $(document).ready(function() {
                 // Add change event listener to the radio buttons
                 $('input[name="inlineRadioRecommend"]').change(function() {
-                    // Submit the form when a radio button is changed
+                    var hiddenInput = document.getElementById('recommendedID').value;
+                    // <input type="text" name="MarkUp" id="MarkUpID" value="">
+                    var MarkUp = document.getElementById('MarkUpID').value;                 
+                     if(MarkUp > 27){
+                       $('#exampleModalK').modal('show');
+                      event.preventDefault();
+                 //   alert(hiddenValue + "IS GREATER THAN 27%")
+                     }else{
                     $('#ModelLoading').modal('show');
+                     $('#submitEF48').submit();
+              //   alert(hiddenValue + "NOT GREATER THAN 27%")
+                  }
 
-                    event.preventDefault();
-                    $('#submitEF48').submit();
                 });
             });
-
-            
         </script>
 
-<script>
-    function setInProgress() {
-        // Show the spinner
-        document.getElementById('spinner').style.display = 'block';
+        <script>
+            function setInProgress() {
+                // Show the spinner
+                document.getElementById('spinner').style.display = 'block';
 
-        // Example: Simulating a delay of 5 seconds (5000 milliseconds)
-        setTimeout(function () {
-            // Hide the spinner after the process is complete
-            document.getElementById('spinner').style.display = 'none';
-        }, 5000);
-    }
-</script>
+                // Example: Simulating a delay of 5 seconds (5000 milliseconds)
+                setTimeout(function() {
+                    // Hide the spinner after the process is complete
+                    document.getElementById('spinner').style.display = 'none';
+                }, 5000);
+            }
+        </script>
 
 
         {{-- Radio buttons within the model --}}
@@ -909,11 +990,45 @@
             }
         </script>
 
+
+
+
+
         <script>
-            function setIsSubmittedRecommend() {
-                // Set the hidden field value to 'true' before submitting the form
+
+
+            $(document).ready(function() {
+                $("#btnSubK").click(function(){
+
+                    @if ($recommendedAmount != 0)
+                    @if (session('recommendedAmount') != session('lowestAmount'))
+                        var textareaValue = document.getElementById("deviationR").value;
+                        if (textareaValue.trim() === '') {
+                            document.getElementById('deviationR').focus();
+                            document.getElementById('ShowDeviationReason').style.display='block';
+                            event.preventDefault();
+
+                        }
+                    @endif
+                @endif
                 document.getElementById('isSubmitRecommend').value = 'true';
-            }
+
+
+                var MarkUp = document.getElementById('MarkUpID').value;
+
+                 
+                if (MarkUp > 27) {
+    $('#exampleModalK').modal('show');
+    event.preventDefault();
+    setTimeout(function() {
+        window.location.reload();
+    }, 2000); // 4 seconds delay before reloading
+}
+
+                })
+                
+            });
+
         </script>
 
 

@@ -57,49 +57,27 @@ class SendEmail
  
     }
 
-
-    public static function sendSupplierEmail($refNo, $closingDate, $attach1, $attach2 , $attach3, $email,$schoolName)
-    {
-        $data = [
-            'schoolName' => $schoolName,
-            'closingDate' => $closingDate,
-        ];
-    
-        // Send the email with three attachments
-        Mail::send('emails.supplier_quotation', $data, function ($message) use ($email, $attach1, $attach2, $attach3,$refNo) {
-            $message->to($email);
-            $message->subject("Quotation Required for Reference $refNo");
-    
-            // Attachments
-            $message->attach($attach1);
-            $message->attach($attach2);
-            $message->attach($attach3);
-           $message->from('Ellavarsi.Pillay@itrelated.co.za', 'Ella Pillay'); 
-        });
-
-        
-    }
+  
 
 
-    public static function sendRecommendedSupplierMail($requestType,$schoolName, $email, $attach1)
-    {
-        $data = [
-            'schoolName' => $requestType,
-            'closingDate' => $schoolName,
-        ];
-    
-        // Send the email with three attachments
-        Mail::send('emails.recommendedSupplierMessage', $data, function ($message) use ($email, $attach1, $requestType, $schoolName) {
-            $message->to($email);
-            $message->subject("Order for .$requestType  .$schoolName");
-    
-            // Attachments
-            $message->attach($attach1);
-           $message->from('Ellavarsi.Pillay@itrelated.co.za', 'Ella Pillay'); 
-        });
+public static function sendSupplierEmail($refNo, $closingDate, $attach1, $attach2 , $email,$schoolName){
+    $data = [
+        'schoolName' => $schoolName,
+        'closingDate' => $closingDate,
+    ];
 
-        
-    }
+    // Send the email with three attachments
+    Mail::send('emails.supplier_quotation', $data, function ($message) use ($email, $attach1, $attach2,$refNo) {
+        $message->to($email);
+        $message->subject("Quotation Required for Reference $refNo");
+
+        // Attachments
+        $message->attach($attach1);
+        $message->attach($attach2);
+      
+       $message->from('Ellavarsi.Pillay@itrelated.co.za', 'Ella Pillay'); 
+    });
+}
  
     // SendEmail::sendnotificationew($SchooName, $Year, $messages, $emis, $ReferencesID);
  
@@ -239,4 +217,42 @@ class SendEmail
             throw $th;
         }
     }
+
+//     public static function sendRecommendedSupplierMail($requestType,$schoolName, $email, $attach1)
+//     {
+//         $data = [
+//             'schoolName' => $requestType,
+//             'closingDate' => $schoolName,
+//         ];
+    
+//         // Send the email with three attachments
+//         Mail::send('emails.recommendedSupplierMessage', $data, function ($message) use ($email, $attach1, $requestType, $schoolName) {
+//             $message->to($email);
+//             $message->subject("Order for .$requestType  .$schoolName");
+    
+//             // Attachments
+//             $message->attach($attach1);
+//            $message->from('Ellavarsi.Pillay@itrelated.co.za', 'Ella Pillay'); 
+//         });
+
+//         
+//     }
+
+
+public static function sendRecommendedSupplierMail($requestType,$schoolName, $email, $attach1){
+    $data = [
+        'schoolName' => $requestType,
+        'closingDate' => $schoolName,
+    ];
+
+    // Send the email with three attachments
+    Mail::send('emails.recommendedSupplierMessage', $data, function ($message) use ($email, $attach1, $requestType, $schoolName) {
+        $message->to($email);
+        $message->subject("Order for .$requestType  .$schoolName");
+
+        // Attachments
+        $message->attach($attach1);
+       $message->from('Ellavarsi.Pillay@itrelated.co.za', 'Ella Pillay'); 
+    });
+}
 }

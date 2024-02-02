@@ -103,13 +103,22 @@
                                 
                             </div>
                         </div>
+                 
+
+
+
                         <div class="col-12 col-md-6 col-xl-6">
-                            <div class="form-group ">
-                                <input type="text" class="form-control form-control-lg" name="Designation" id="Designation" value="{{ old('Designation' , $data->Designation) }}"  required>
+                            <div class="form-group">
+                                <select class="form-control form-control-lg" name="Designation" id="Designation" required>
+                                    <option value="{{ old('Designation' , $data->Designation) }}" selected>{{$data->Designation}}</option>
+                                    @foreach ($designations as $designation)
+                                        <option value="{{ $designation }}">{{ $designation }}</option>
+                                    @endforeach
+                                </select>
                                 @if($errors->has('Designation'))
-                                <span class="text-danger" role="alert">
-                                    <strong>{{ $errors->first('Designation') }}</strong>
-                                </span>
+                                    <span class="text-danger" role="alert">
+                                        <strong>{{ $errors->first('Designation') }}</strong>
+                                    </span>
                                 @endif
                                 <label>Designation<span class="text-danger">*</span></label>
                             </div>
@@ -127,13 +136,13 @@
                         </div>
                         <div class="col-12 col-md-6 col-xl-6">
                             <div class="form-group ">
-                                <input type="text" class="form-control form-control-lg" name="Email" id="Email" value="{{ old('Email' , $data->email) }}" required>
+                                <input type="text" class="form-control form-control-lg" name="Email" id="Email" value="{{ old('Email' , $data->email) }}" >
                                 @if($errors->has('Email'))
                                 <span class="text-danger" role="alert">
                                     <strong>{{ $errors->first('Email') }}</strong>
                                 </span>
                                 @endif
-                                <label>Email<span class="text-danger">*</span></label>
+                                <label>Email<span class="text-danger"></span></label>
                             </div>
                         </div>
 

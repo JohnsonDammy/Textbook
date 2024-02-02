@@ -88,8 +88,7 @@
 
                     @foreach ($comiteeData as $item)
                     <tr>
-                        <td> {{ $item->Name }}</td><td>{{ $item->Designation }} </td><td>{{ $item->Contact_No }} </td> <td>{{ $item->email }}</td> <td>{{ $item->Signature }} </td><td>&nbsp;
-                        </td>
+                        <td> {{ $item->Name }}</td><td>{{ $item->Designation }} </td><td>{{ $item->Contact_No }} </td> <td>{{ $item->email }}</td> <td>   &nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;              </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                     </tr>
                     @endforeach
 

@@ -37,11 +37,12 @@ class chooseSupplier extends Controller
  
  
         $supplierData = DB::table('suppliyer')
-            ->join('school_suppliyer', 'suppliyer.Id', '=', 'school_suppliyer.Suppliyer_id')
-            ->where('school_suppliyer.Emis', '=', session('emis'))
-            ->select('suppliyer.*' ,'suppliyer.email', 'suppliyer.CompanyName', 'suppliyer.CompanyAddress', 'suppliyer.CompanyContact' ) // Add other columns as needed
-            ->get();
- 
+        ->join('school_suppliyer', 'suppliyer.Id', '=', 'school_suppliyer.Suppliyer_id')
+        ->where('school_suppliyer.Emis', '=', session('emis'))
+        ->where('school_suppliyer.IsActive', '=', "1")
+        ->select( 'suppliyer.Id','suppliyer.email', 'suppliyer.CompanyName', 'suppliyer.CompanyAddress', 'suppliyer.CompanyContact') // Add other columns as needed
+        ->get();
+
             session(['supplierData' => $supplierData]);
  
         $savedSuppliers= savedSuppliers::where('emis', $emis)->where('requestType', session('requestType'))->get();
@@ -156,13 +157,14 @@ class chooseSupplier extends Controller
         $closingDate = $request->input('closingDate');
  
      
+ 
         session(['closingDate' => $closingDate]);
  
         if ($checkAllStatus == 'true') {
             $selectedSuppliers= false ;
         } else {
             $selectedSuppliers= true;
-
+         
         }
  
  
@@ -274,11 +276,14 @@ class chooseSupplier extends Controller
         }
 
  
-        $commiteeFile=doc_commitee::where('emis',  session('emis') )->where('requestType', session('requestType'))->where('status', "signed")->value('fileName');
+      /*   $commiteeFile=doc_commitee::where('emis',  session('emis') )->where('requestType', session('requestType'))->where('status', "signed")->value('fileName');
         $attachComitee= "public/ComiteePDF_Signed/" .$commiteeFile;
  
         $disclosureFile= doc_disclosure::where('emis',  session('emis') )->where('requestType', session('requestType'))->value('fileName');
         $attachDisclosure="public/DisclosurePDF_Signed/"  .$disclosureFile;
+      */
+
+        $attachSBD4= "public/pdf/sbd4_standard.pdf";
  
         $refNo= inbox_school::where('school_emis', session('emis'))->where('requestType', session('requestType'))->value('referenceNo');
  
@@ -363,7 +368,7 @@ class chooseSupplier extends Controller
            }
          
  
-            SendEmail::sendSupplierEmail($refNo, $closingDate, $attachQuote, $attachComitee, $attachDisclosure, $email, session('schoolname'));
+            SendEmail::sendSupplierEmail($refNo, $closingDate, $attachQuote,$attachSBD4 , $email, session('schoolname'));
             $sucessEmail = true;
  
             }
@@ -397,7 +402,5 @@ class chooseSupplier extends Controller
  
         ]);
        
-       
-    }
 }
- 
+}

@@ -240,8 +240,8 @@
                             <li>
                                 <a href="{{ route('notification') }}">
                                     {{-- {{$count}} --}}
-                                <i class="fa fa-bell" style=" color: green"><span style="color:red; font-size:14px"><strong>2</strong></span></i>
-                                <span style="margin-left:-7px">Notification</span>
+                                <i class="fa fa-bell" style=" color: green"><span style="color:red; font-size:14px"><strong>{{$notificationInbox}}</strong></span></i>
+                                <span style="margin-left:-3px">Notification</span>
                             </a>
                             </li>
                                        
@@ -264,9 +264,11 @@
                             <li>
                                 <a href="{{ route('AdminDelivery.list') }}">
                                     <i class="fas fa-shipping-fast" style="font-size:20px; color: green" ></i>
-                                    <span style="margin-left:-7px">Capture Delivery</span>
+                                    <span style="margin-left:-7px"><span style="color:red; font-size:17px; margin-left:-7px "><strong>{{$countDelivery}}</strong></span>   Capture Delivery</span>
                                 </a>
                             </li>
+
+                   
 
                             <li>
  

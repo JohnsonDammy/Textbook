@@ -215,20 +215,27 @@ margin-left: 30px;
         <tr>
             <td style="width: -50px">{{ $loop->iteration }}</td> 
             <td>{{ $item->CompanyName }}</td>
-         <td> R {{ number_format($item->amount , 2, '.', ',') }}</td>
+         <td style="width: auto;"> R {{ number_format($item->amount , 2, '.', ',') }}</td>
 
          <td>{{ $item->comment }}</td> 
          <td>{{ $item->taxClearance }}</td>
         </tr>
         @endforeach
         <tr>
-            <td style="width: 160px">RECOMMENDED SUPPLIER     </td>  
-        </tr>
-   
+          <td style="width: 160px">RECOMMENDED SUPPLIER     </td>  
+          <td style="width: 400px">{{ $recommendedSupplierName }}</td>
+          <td style="width: 400px" colspan="3"> TOTAL PRICE (VAT INCLUSIVE)
+            &nbsp;R {{ number_format($recommendedSupplierAmount +($recommendedSupplierAmount * 15/100) , 2, '.', ',') }}</td>
+         
+      </tr>
+      <tr>
+        <td style="width: 160px">DEVIATION REASON </td>
+        <td style="width: 400px" colspan="4">{{$DeviationReason}}</td>
+      </tr>
+ 
       </table>
-      <div class="boxP3">{{ $recommendedSupplierName }}</div>
-      <div class="boxP4">TOTAL PRICE (VAT INCLUSIVE)</div>
-      <div class="boxP5">R {{ number_format($recommendedSupplierAmount +($recommendedSupplierAmount * 15/100) , 2, '.', ',') }}</div>
+     
+      
       <table border="1">
         <tr>
             <td>&nbsp;</td><td>In respect of the recommended quotation, it is hereby certified that:-</td>
@@ -266,10 +273,10 @@ margin-left: 30px;
             <td>PRINCIPAL - NAME</td><td>&nbsp;</td> <td>SIGNATURE</td><td>&nbsp;</td><td>DATE</td>
            </tr>
            <tr>
-            <td>PRINCIPAL - NAME</td><td>&nbsp;</td> <td>SIGNATURE</td><td>&nbsp;</td><td>DATE</td>
+            <td>SGB CHAIRPERSON - NAME</td><td>&nbsp;</td> <td>SIGNATURE</td><td>&nbsp;</td><td>DATE</td>
            </tr>
            <tr>
-            <td>PRINCIPAL - NAME</td><td>&nbsp;</td> <td>SIGNATURE</td><td>&nbsp;</td><td>DATE</td>
+            <td>SGB TREASURER - NAME</td><td>&nbsp;</td> <td>SIGNATURE</td><td>&nbsp;</td><td>DATE</td>
            </tr>
       </table>
 

@@ -3,11 +3,20 @@
 namespace App\Providers;
 
 use App\Models\inbox_school;
+use App\Models\Inbox;
 use Illuminate\Support\ServiceProvider;
 use App\Models\UploadModel;
 use App\Models\RequestFundsModel;
 use App\Models\RequestPrecurementModel;
+use App\Models\User;
+use App\Models\doc_quote;
+
+use App\Models\deliveryCapture;
+use Illuminate\Support\Facades\DB;
+
+
 use Illuminate\Support\Facades\Auth;
+
 
 class ViewComposerServiceProvider extends ServiceProvider
 {
@@ -40,11 +49,46 @@ class ViewComposerServiceProvider extends ServiceProvider
             $hideDelivery= RequestFundsModel::where('School_Emis', $emis)->value("Status");
             $HideForNoDeclaration = RequestPrecurementModel::where('School_Emis', $emis)->where('NoDeclaration', "Yes")->exists();
 
+            $districtId = Auth::user()->District_Id;
+
+
+            $notificationInbox = Inbox::where('District_Id', $districtId)->where('DelVal' , "1")
+            
+            ->count();
+
+
+
+            $user = Auth::user()->username;
+            $district_id = User::where('username', $user)->value('District_id');
+            $quotesData = doc_quote::all();
+            $deliveryData = deliveryCapture::all();
+            
+    
+            $isActive = "1";
+    
+    
+    
+            $query = DB::table('deliveryselection')
+            ->join('schools', 'deliveryselection.Emis', '=', 'schools.emis')
+            ->select('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number')
+            ->groupBy('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number');
+        
+        // Get the count of records
+        $countDelivery = $query->count();
+        
+        // Use the paginate() method to get paginated results
+        $data = $query->paginate(10);
+        
+
             $AllowProcurement = $existAllocation ? true : false;
             $view->with('AllowProcurement', $AllowProcurement)
                  ->with('existSelection', $existSelection)
                  ->with('HideForNoDeclaration',   $HideForNoDeclaration)
-                 ->with('hideDelivery', $hideDelivery);
+                 ->with('hideDelivery', $hideDelivery)
+                 ->with('notificationInbox', $notificationInbox)
+                 ->with('countDelivery', $countDelivery);
+
+
         });
     }
 }

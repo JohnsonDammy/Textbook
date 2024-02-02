@@ -50,9 +50,19 @@
 
             {{-- , 'fundsId' => session('fundsId')]) --}}
             <br>
+            @if (session('requestType') === "Textbook")
             <a href="{{ route('AdminCaptureSupplierOrder', ['requestType' => session('requestType'), 'emis' => session('emis') , 'fundsId' => session('fundsId')]) }}">
                 <i class="fa fa-arrow-circle-left" style="font-size: 30px;" aria-hidden="true"></i>
             </a>
+
+            @else
+
+            {{-- Route::get('/CaptureUnit/{RequestTypes}/{Emis}/{fundsId}', [\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'CaptureStatUnitPrice'])->name('AdminCaptureStatUnitPrice'); --}}
+             {{-- <a href="{{ route('AdminCaptureStatUnitPrice', ['RequestTypes' => session('requestType'), 'Emis' => session('emis') , 'fundsId' => session('fundsId')]) }}">
+                <i class="fa fa-arrow-circle-left" style="font-size: 30px;" aria-hidden="true"></i> --}}
+            </a> 
+            @endif
+     
 
             <br><br>
             <center>
@@ -80,7 +90,7 @@
 
                             <label for="firstName">SBD4 Form:</label>
                             <p class="form-control" style="text-align: left;" >
-                                <i class="fa fa-download" aria-hidden="true"></i><a href="{{ route('downloadSBD4Admin', ['fileName' => $supplierRec->disclosureForm]) }} "
+                                <i class="fa fa-download" aria-hidden="true"></i><a href="{{ route('downloadSBD4Admin', ['fileName' => $supplierRec->sbd4Form]) }} "
                                 style="color:green; text-decoration: underline; font-style:italic"
                                 onmouseover="this.style.color='grey'"
                                 onmouseout="this.style.color='green'"> Download<a>
@@ -89,19 +99,19 @@
 
                         </div>
 
-                        <div class="form-group" >
-
-                            <label for="firstName">Disclosure Form:</label>
+                        {{-- <div class="form-group" >
+                            {{-- {{$supplierRec->disclosureForm}} --}}
+                            {{-- <label for="firstName">Disclosure Form:</label>
                            <p class="form-control" style="text-align: left;">
-                            <i class="fa fa-download" aria-hidden="true"></i><a href=" {{ route('downloadDisclosureAdmin', ['fileName' => $supplierRec->sbd4Form]) }} "
+                            <i class="fa fa-download" aria-hidden="true"></i><a href=" {{ route('downloadDisclosureAdmin', ['fileName' => $supplierRec->disclosureForm]) }} "
                                 style="color:green; text-decoration: underline; font-style:italic"
                                 onmouseover="this.style.color='grey'"
                                 onmouseout="this.style.color='green'"> Download<a>
-                            <p>
+                            <p> --}}
                             
 
 
-                        </div>
+                        {{-- </div> --}} 
 
                         <div class="form-group">
 
@@ -117,10 +127,13 @@
 
                         </div>
 
-                       <div class="form-group">
+                        @if (session('requestType') === "Textbook")
+                        <div class="form-group">
                             <label for="firstName">Mark Up % :</label>
                             <input  style="background-color: #f4f9f4;" type="text" class="form-control" name="markUp" disabled value="{{ $supplierRec->markUp }}">
-                        </div> 
+                        </div>
+                        @endif
+                     
 
                         <div class="form-group">
                             <label for="firstName">Amount :</label>

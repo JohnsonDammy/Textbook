@@ -24,11 +24,9 @@ class textbook_cat extends Controller
 {
     public function index($requestType, $idInbox)
     {
-
-
         // Set session variables
   
-        session()->forget('activeTab');
+      //  session()->forget('activeTab');
         session()->forget('schoolLevel');
         /* if(session('status') != "complete")
         {
@@ -116,7 +114,9 @@ class textbook_cat extends Controller
             ->with('Publishers', $Publishers)
             ->with('Publishers', $Publishers)
             ->with('dataSavedTextbook', $dataSavedTextbook)
-            ->with('textbooksData', $textbooksData);
+            ->with('textbooksData', $textbooksData)
+            ->with('activeTab', 'tab2');
+
     }
 
     public function filterCatalogue(Request $request)
@@ -203,13 +203,131 @@ class textbook_cat extends Controller
             session(['textbooksData' => $textbooksData]);
         }
       
-      
+      $activeTab = "tab2";
 
 
         //Return the view 
-        return view('Section21_C.RequestQuotation.textbookCat', compact('data', 'textbooksData', 'requestType', 'Subjects', 'Publishers', 'idInbox', 'messageLoaded', 'dataSavedTextbook', 'schoolLevel', 'emis'));
+        return view('Section21_C.RequestQuotation.textbookCat', compact('data', 'textbooksData', 'requestType', 'Subjects', 'Publishers', 'idInbox', 'messageLoaded', 'dataSavedTextbook', 'schoolLevel', 'emis', 'activeTab'));
     }
 
+    public function updateTextbookItem(Request $request, $ISBN, $Price) 
+    {
+     
+       $newQuantity = $request->input('newQuantity');
+        DB::table('savedtextbookitems')
+        ->where('ISBN',$ISBN)
+        ->update([
+            'Quantity' =>  $newQuantity,
+            'TotalPrice' =>  $newQuantity * $Price ,
+            
+        ]);
+
+        $emis = auth()->user()->username;
+        $requestType = session('requestType', 'default_value_if_not_set');
+        $fileName = doc_quote::where('emis', $emis)->where('requestType',   $requestType )->value('FileName');
+
+        // Delete the record based on the condition
+        doc_quote::where('emis', $emis)->where('requestType',   $requestType )->delete();
+
+        if ($fileName) {
+            // Delete the file using Laravel's file system methods (assuming public disk)
+            Storage::disk('public')->delete('GenPdf/' . $fileName);
+        }
+        session(['status' => 'Not Generated']);
+
+
+         
+        session()->forget('activeTab');
+        session()->forget('schoolLevel');
+        /* if(session('status') != "complete")
+        {
+        session(['status' => "In Progress"]);
+        } */
+
+
+        session()->forget('dataSavedTextbook');
+        session()->forget('textbooksData');
+        session()->forget('emis');
+        session(['requestType' => $requestType]);
+
+
+      
+       
+       
+
+        //Set the default values of dropdown when page loads
+        session(['selectedGrade' => 'default']);
+        session(['selectedSubject' => 'default']);
+        session(['selectedPublisher' => 'default']);
+
+
+        $data = inbox_school::all();
+
+        //Get all the SavedItems for textbook
+
+        //Get Items list for the subject and Publisher dropdownList
+
+        $emis = Auth::user()->username;
+        $quoteStatus = inbox_school::where('requestType', "Textbook")->where('school_emis', $emis)->value('status');
+        session(['quoteStatus' => $quoteStatus]);
+        $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Textbook')->value('allocation');
+        session(['AllocatedAmt' => $AllocatedAmt]);
+        session(['emis' => $emis]);
+        $schoolLevel = School::where('emis', $emis)->value('level_id');
+
+
+        $querySavedItems = savedtextbookitems::where('school_emis', $emis)
+            ->orderBy('Grade')
+            ->get();     
+               $dataSavedTextbook = $querySavedItems;
+        session(['dataSavedTextbook' => $dataSavedTextbook]);
+
+        // session(['status' => 'In Progress']);
+
+        //Get School Level Filter default textbook catalogue based on school level (Grade Range)
+
+        if ($schoolLevel == 1) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 7]);
+
+        } elseif ($schoolLevel == 2) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [8, 12]);
+        } else {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 12]);
+        }
+
+        $textbooksData = $queryCatalogueData->paginate(50);
+        session(['textbooksData' => $textbooksData]);
+
+
+        session(['schoolLevel' => $schoolLevel]);
+        $Subjects = textbookCatModel::distinct()->pluck('Subject');
+        $Publishers = textbookCatModel::distinct()->pluck('Publisher');
+        $status = "In Progress";
+
+        $quoteData = doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->get();
+        $status=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("status");
+        session(['status' => $status]);
+        $TotalPages=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("Total_Pages");
+        session(['TotalPages' => $TotalPages]);
+        $orderedAmt=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("ordered_amt");
+        session(['orderedAmt' => $orderedAmt]);
+
+        session(['quoteData' => $quoteData]);
+
+        return view('Section21_C.RequestQuotation.textbookCat')
+            ->with('data', $data)
+            ->with('requestType', $requestType)
+            ->with('emis', $emis)
+            ->with('schoolLevel', $schoolLevel)
+            ->with('Subjects', $Subjects)
+            ->with('Publishers', $Publishers)
+            ->with('Publishers', $Publishers)
+            ->with('dataSavedTextbook', $dataSavedTextbook)
+            ->with('textbooksData', $textbooksData)
+            ->with('idInbox', session("idInbox"))
+
+            ->with('activeTab', 'tab3');
+    }
 
     public function saveCheckedItems(Request $request)
     {
@@ -350,6 +468,105 @@ class textbook_cat extends Controller
     public function deleteTextbookItem($id)
     {
 
+        $emis = auth()->user()->username;
+        $requestType = session('requestType', 'default_value_if_not_set');
+        $fileName = doc_quote::where('emis', $emis)->where('requestType',   $requestType )->value('FileName');
+
+        // Delete the record based on the condition
+        doc_quote::where('emis', $emis)->where('requestType',   $requestType )->delete();
+
+        if ($fileName) {
+            // Delete the file using Laravel's file system methods (assuming public disk)
+            Storage::disk('public')->delete('GenPdf/' . $fileName);
+        }
+        session(['status' => 'Not Generated']);
+
+
+         
+        session()->forget('activeTab');
+        session()->forget('schoolLevel');
+        /* if(session('status') != "complete")
+        {
+        session(['status' => "In Progress"]);
+        } */
+
+
+        session()->forget('dataSavedTextbook');
+        session()->forget('textbooksData');
+        session()->forget('emis');
+        session(['requestType' => $requestType]);
+
+
+      
+       
+       
+
+        //Set the default values of dropdown when page loads
+        session(['selectedGrade' => 'default']);
+        session(['selectedSubject' => 'default']);
+        session(['selectedPublisher' => 'default']);
+
+
+        $data = inbox_school::all();
+
+        //Get all the SavedItems for textbook
+
+        //Get Items list for the subject and Publisher dropdownList
+
+        $emis = Auth::user()->username;
+        $quoteStatus = inbox_school::where('requestType', "Textbook")->where('school_emis', $emis)->value('status');
+        session(['quoteStatus' => $quoteStatus]);
+        $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Textbook')->value('allocation');
+        session(['AllocatedAmt' => $AllocatedAmt]);
+        session(['emis' => $emis]);
+        $schoolLevel = School::where('emis', $emis)->value('level_id');
+
+
+        $querySavedItems = savedtextbookitems::where('school_emis', $emis)
+            ->orderBy('Grade')
+            ->get();     
+               $dataSavedTextbook = $querySavedItems;
+        session(['dataSavedTextbook' => $dataSavedTextbook]);
+
+        // session(['status' => 'In Progress']);
+
+        //Get School Level Filter default textbook catalogue based on school level (Grade Range)
+
+        if ($schoolLevel == 1) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 7]);
+
+        } elseif ($schoolLevel == 2) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [8, 12]);
+        } else {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 12]);
+        }
+
+        $textbooksData = $queryCatalogueData->paginate(50);
+        session(['textbooksData' => $textbooksData]);
+
+
+        session(['schoolLevel' => $schoolLevel]);
+        $Subjects = textbookCatModel::distinct()->pluck('Subject');
+        $Publishers = textbookCatModel::distinct()->pluck('Publisher');
+        $status = "In Progress";
+
+        $quoteData = doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->get();
+        $status=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("status");
+        session(['status' => $status]);
+        $TotalPages=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("Total_Pages");
+        session(['TotalPages' => $TotalPages]);
+        $orderedAmt=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("ordered_amt");
+        session(['orderedAmt' => $orderedAmt]);
+
+        session(['quoteData' => $quoteData]);
+
+ 
+
+
+
+
+////////////////////////////
+        
         // Delete the record with the specified ISBN
         $emis = session('emis');
 
@@ -360,17 +577,40 @@ class textbook_cat extends Controller
         session(['dataSavedTextbook' => $dataSavedTextbook]);
 
         if ($result) {
-            return redirect()->back()->with([
-                'success' => 'Item Deleted Successfully!',
-                'activeTab' => 'tab3',
-                // Set the active tab here
-            ]);
+            // return redirect()->back()->with([
+            //     'activeTab' => 'tab3',
+            //     // Set the active tab here
+            // ]);
+
+
+            return view('Section21_C.RequestQuotation.textbookCat')
+            ->with('data', $data)
+            ->with('requestType', $requestType)
+            ->with('emis', $emis)
+            ->with('schoolLevel', $schoolLevel)
+            ->with('Subjects', $Subjects)
+            ->with('Publishers', $Publishers)
+            ->with('Publishers', $Publishers)
+            ->with('dataSavedTextbook', $dataSavedTextbook)
+            ->with('textbooksData', $textbooksData)
+            ->with('idInbox', session("idInbox"))
+            ->with('success',  'Item Deleted Successfully!')
+            ->with('activeTab', 'tab3');
+
         } else {
-            return redirect()->back()->with([
-                'success' => 'Item Deleted Successfully!',
-                'activeTab' => 'tab3',
-                // Set the active tab here
-            ]);
+            return view('Section21_C.RequestQuotation.textbookCat')
+            ->with('data', $data)
+            ->with('requestType', $requestType)
+            ->with('emis', $emis)
+            ->with('schoolLevel', $schoolLevel)
+            ->with('Subjects', $Subjects)
+            ->with('Publishers', $Publishers)
+            ->with('Publishers', $Publishers)
+            ->with('dataSavedTextbook', $dataSavedTextbook)
+            ->with('textbooksData', $textbooksData)
+            ->with('idInbox', session("idInbox"))
+            ->with('success',  'Item Deleted Successfully!')
+            ->with('activeTab', 'tab3');
         }
 
 
@@ -416,6 +656,105 @@ class textbook_cat extends Controller
     {
 
 
+        $emis = auth()->user()->username;
+        $requestType = session('requestType', 'default_value_if_not_set');
+        $fileName = doc_quote::where('emis', $emis)->where('requestType',   $requestType )->value('FileName');
+
+        // Delete the record based on the condition
+        doc_quote::where('emis', $emis)->where('requestType',   $requestType )->delete();
+
+        if ($fileName) {
+            // Delete the file using Laravel's file system methods (assuming public disk)
+            Storage::disk('public')->delete('GenPdf/' . $fileName);
+        }
+        session(['status' => 'Not Generated']);
+
+
+         
+        session()->forget('activeTab');
+        session()->forget('schoolLevel');
+        /* if(session('status') != "complete")
+        {
+        session(['status' => "In Progress"]);
+        } */
+
+
+        session()->forget('dataSavedTextbook');
+        session()->forget('textbooksData');
+        session()->forget('emis');
+        session(['requestType' => $requestType]);
+
+
+      
+       
+       
+
+        //Set the default values of dropdown when page loads
+        session(['selectedGrade' => 'default']);
+        session(['selectedSubject' => 'default']);
+        session(['selectedPublisher' => 'default']);
+
+
+        $data = inbox_school::all();
+
+        //Get all the SavedItems for textbook
+
+        //Get Items list for the subject and Publisher dropdownList
+
+        $emis = Auth::user()->username;
+        $quoteStatus = inbox_school::where('requestType', "Textbook")->where('school_emis', $emis)->value('status');
+        session(['quoteStatus' => $quoteStatus]);
+        $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Textbook')->value('allocation');
+        session(['AllocatedAmt' => $AllocatedAmt]);
+        session(['emis' => $emis]);
+        $schoolLevel = School::where('emis', $emis)->value('level_id');
+
+
+        $querySavedItems = savedtextbookitems::where('school_emis', $emis)
+            ->orderBy('Grade')
+            ->get();     
+               $dataSavedTextbook = $querySavedItems;
+        session(['dataSavedTextbook' => $dataSavedTextbook]);
+
+        // session(['status' => 'In Progress']);
+
+        //Get School Level Filter default textbook catalogue based on school level (Grade Range)
+
+        if ($schoolLevel == 1) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 7]);
+        } elseif ($schoolLevel == 2) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [8, 12]);
+        } else {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 12]);
+        }
+
+        $textbooksData = $queryCatalogueData->paginate(50);
+        session(['textbooksData' => $textbooksData]);
+
+
+        session(['schoolLevel' => $schoolLevel]);
+        $Subjects = textbookCatModel::distinct()->pluck('Subject');
+        $Publishers = textbookCatModel::distinct()->pluck('Publisher');
+        $status = "In Progress";
+
+        $quoteData = doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->get();
+        $status=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("status");
+        session(['status' => $status]);
+        $TotalPages=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("Total_Pages");
+        session(['TotalPages' => $TotalPages]);
+        $orderedAmt=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("ordered_amt");
+        session(['orderedAmt' => $orderedAmt]);
+
+        session(['quoteData' => $quoteData]);
+
+ 
+
+
+
+
+
+
+        ////////////////////////////////
         $emis = Auth::user()->username;
         $AllocatedTextbook=UploadModel::where('EMIS', $emis)->value('TEXTBOOK ALLOCATION');
         $orderedAmount = $request->input("orderedAmount");
@@ -434,6 +773,22 @@ class textbook_cat extends Controller
 
         if($orderedAmount > $AllocatedTextbook){
             return redirect()->back()->with(['successD' => 'Total order amount is greater than Allocation funds amount, please reduce your quantity']);
+
+
+            // return view('Section21_C.RequestQuotation.textbookCat')
+            // ->with('data', $data)
+            // ->with('emis', $emis)
+            // ->with('schoolLevel', $schoolLevel)
+            // ->with('Subjects', $Subjects)
+            // ->with('Publishers', $Publishers)
+            // ->with('Publishers', $Publishers)
+            // ->with('pages', "1")
+            // ->with('dataSavedTextbook', $dataSavedTextbook)
+            // ->with('textbooksData', $textbooksData)
+            // ->with('idInbox', session("idInbox"))
+            // ->with('requestType', 'Textbook')
+            // ->with('successD', '')
+            // ->with('activeTab', 'tab3');
 
         }else{
 
@@ -468,9 +823,29 @@ class textbook_cat extends Controller
     
     
             session(['status' => 'Generated']);
+
+            $message ="OK";
+
+            session(['message' => $message]);
+
+
+
     
-            return redirect()->route('textbookCat', ['requestType' => "Textbook", 'idInbox' => 1])
-                ->with(['activeTab' => 'tab3', 'pages' => $pages]);
+    
+                return view('Section21_C.RequestQuotation.textbookCat')
+                ->with('data', $data)
+                ->with('emis', $emis)
+                ->with('schoolLevel', $schoolLevel)
+                ->with('Subjects', $Subjects)
+                ->with('Publishers', $Publishers)
+                ->with('Publishers', $Publishers)
+                ->with('pages', $pages)
+                ->with('dataSavedTextbook', $dataSavedTextbook)
+                ->with('textbooksData', $textbooksData)
+                ->with('idInbox', session("idInbox"))
+                ->with('requestType', 'Textbook')
+                ->with('activeTab', 'tab3')
+                ->with('message', $message);
         }
         
 
@@ -480,7 +855,7 @@ class textbook_cat extends Controller
     }
 
 
-    public function viewQuotess()
+    public function viewQuotes()
     {
         $emis = auth()->user()->username;
          $requestType = session('requestType', 'default_value_if_not_set');
@@ -514,8 +889,98 @@ class textbook_cat extends Controller
             Storage::disk('public')->delete('GenPdf/' . $fileName);
         }
         session(['status' => 'Not Generated']);
+        session()->forget('activeTab');
+        session()->forget('schoolLevel');
+        /* if(session('status') != "complete")
+        {
+        session(['status' => "In Progress"]);
+        } */
 
-        return redirect()->back()->with(['activeTab' => 'tab3']);
+
+        session()->forget('dataSavedTextbook');
+        session()->forget('textbooksData');
+        session()->forget('emis');
+        session(['requestType' => $requestType]);
+
+
+      
+       
+       
+
+        //Set the default values of dropdown when page loads
+        session(['selectedGrade' => 'default']);
+        session(['selectedSubject' => 'default']);
+        session(['selectedPublisher' => 'default']);
+
+
+        $data = inbox_school::all();
+
+        //Get all the SavedItems for textbook
+
+        //Get Items list for the subject and Publisher dropdownList
+
+        $emis = Auth::user()->username;
+        $quoteStatus = inbox_school::where('requestType', "Textbook")->where('school_emis', $emis)->value('status');
+        session(['quoteStatus' => $quoteStatus]);
+        $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Textbook')->value('allocation');
+        session(['AllocatedAmt' => $AllocatedAmt]);
+        session(['emis' => $emis]);
+        $schoolLevel = School::where('emis', $emis)->value('level_id');
+
+
+        $querySavedItems = savedtextbookitems::where('school_emis', $emis)
+            ->orderBy('Grade')
+            ->get();     
+               $dataSavedTextbook = $querySavedItems;
+        session(['dataSavedTextbook' => $dataSavedTextbook]);
+
+        // session(['status' => 'In Progress']);
+
+        //Get School Level Filter default textbook catalogue based on school level (Grade Range)
+
+        if ($schoolLevel == 1) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 7]);
+
+        } elseif ($schoolLevel == 2) {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [8, 12]);
+        } else {
+            $queryCatalogueData = textbookCatModel::whereBetween('Grade', [1, 12]);
+        }
+
+        $textbooksData = $queryCatalogueData->paginate(50);
+        session(['textbooksData' => $textbooksData]);
+
+
+        session(['schoolLevel' => $schoolLevel]);
+        $Subjects = textbookCatModel::distinct()->pluck('Subject');
+        $Publishers = textbookCatModel::distinct()->pluck('Publisher');
+        $status = "In Progress";
+
+        $quoteData = doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->get();
+        $status=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("status");
+        session(['status' => $status]);
+        $TotalPages=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("Total_Pages");
+        session(['TotalPages' => $TotalPages]);
+        $orderedAmt=   doc_quote::where('Emis', session("emis"))->where('requestType', "Textbook")->value("ordered_amt");
+        session(['orderedAmt' => $orderedAmt]);
+
+        session(['quoteData' => $quoteData]);
+
+        return view('Section21_C.RequestQuotation.textbookCat')
+            ->with('data', $data)
+            ->with('requestType', $requestType)
+            ->with('emis', $emis)
+            ->with('schoolLevel', $schoolLevel)
+            ->with('Subjects', $Subjects)
+            ->with('Publishers', $Publishers)
+            ->with('Publishers', $Publishers)
+            ->with('dataSavedTextbook', $dataSavedTextbook)
+            ->with('textbooksData', $textbooksData)
+            ->with('idInbox', session("idInbox"))
+
+            ->with('activeTab', 'tab3');
+
+       //return redirect()->back()->with(['activeTab' => 'tab3']);
 
     }
 

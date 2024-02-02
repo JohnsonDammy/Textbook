@@ -118,8 +118,8 @@
                         <div class="modal-body">
                             <div class="text-center">
                                 <img src="{{ asset('img/popup-check.svg') }}" class="img-fluid mb-5" alt="">
-                                <h4 class="modal-title">Successfully sent emails</h4>
-                                <p class="modal-title_des">All emails sent to respective selected suppliers with attachments
+                                <h4 class="modal-title">Email sent successfully</h4>
+                                <p class="modal-title_des">
                                 </p>
                             </div>
 
@@ -166,11 +166,10 @@
             <div class="row align-items-center border-bottom border-2">
                 <br>
 
-                <form id="yourFormId" action=" {{ route('requestQuote') }} " method="post"
+                <form id="yourFormId" class="form-with-modal" action=" {{ route('requestQuote') }} " method="post"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-
 
                         <div class="col-12 col-md-12 my-3">
                             <div class="row g-4">
@@ -179,11 +178,11 @@
                                     <div style="display:none" id= "errorClosingDate" class="text-danger">Please closing
                                         date</div>
                                     <label for="exampleDate">Select a Closing Date:</label>
-                                    <div class="input-group">
-                                        <input type="text" placeholder="MM/DD/YYYY" class="form-control datepicker" id="exampleDate" name="closingDate" id="closingDateInput" required value="{{ old('closingDate', session('closingDate')) }}">
+                                    <div class="input-group" >
+                                        <input type="text" placeholder="DD/MM/YYYY" class="form-control datepicker" id="exampleDate" name="closingDate" id="closingDateInput" required value="{{ old('closingDate', session('closingDate')) }}">
                                         <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="fa fa-calendar" style="font-size: 20px;" ></i>
+                                            <span class="input-group-text" style="background-color:#F4F9F4">
+                                                <i class="fa fa-calendar"  style="font-size: 40px; background-color:#f4f9f;" ></i>
                                             </span>
                                         </div>
                                     </div>
@@ -194,7 +193,7 @@
                                 @if(session('requestType') == "Textbook")
 
                                 <div class="form-group col-12 col-md-6 col-xl-2">
-                                    <a href="{{ route('viewQuotess') }}"
+                                    <a href="{{ route('viewQuotes') }}"
                                         style="color:green; text-decoration: underline; font-style: italic;">
                                         View Quote Textbook
                                     </a>
@@ -209,7 +208,7 @@
                                 </div>
                                 @endif
 
-                                <input type="text" class="datepicker">
+                                <input type="hidden" class="datepicker">
                             </div>
 
                         </div>
@@ -227,7 +226,7 @@
 
                         <div style="max-height: 400px; overflow-y: auto;">
                             <div class="mt-2">
-                                <input type="checkbox" id="checkAll" class="checkbox">
+                                <input type="checkbox" id="checkAll" class="checkbox" required>
                                 <label for="checkAll">Select All</label>
                                 <input type="hidden" id="checkAllStatus" name="checkAllStatus" value="false">
                             </div>
@@ -320,7 +319,7 @@
                         <div class="row g-4">
                             <div class="form-group col-12 col-md-6 col-xl-3">
 
-                                <i class="fas fa-download" style="color: green;"></i><a
+                                <i class="fa-solid fa-download" style="color: green;"></i><a
                                     href=" {{ route('downloadComitee') }} "
                                     style="color:green; text-decoration: underline; font-style: italic;" onclick="enableUploadInputCommittee()">
                                     Commitee Form
@@ -334,7 +333,7 @@
                                             use App\Models\doc_commitee;
                                         @endphp
                                         @if (doc_commitee::where('emis', session('emis'))->where('requestType', session('requestType'))->where('status', 'signed')->exists())
-                                            <label for="reference-number">Uploaded Committee PDFs</label>
+                                            <label for="reference-number">  <i class="fa-solid fa-upload" style="color: green;"></i>Uploaded Committee PDFs</label>
                                             @php
                                                 $fileName = doc_commitee::where('emis', session('emis'))
                                                     ->where('requestType', session('requestType'))
@@ -343,12 +342,11 @@
                                             @endphp
                                             <p> {{ $fileName }} </p>
                                         @else
-                                            <label for="reference-number">Upload Committee</label>
+                                            <label for="reference-number"><i class="fa-solid fa-upload" style="color: green;"></i>Upload Committee</label>
                                             <div class="input-group">
                                                 <input type="file" name="fileComitee" id="fileComiteeInput" required
-                                                    value="{{ old('fileCommiteeName', session('fileCommiteeName')) }}" disabled>
-                                                <div style="display:none" id= "errorComitee" class="text-danger">Please
-                                                    select file</div>
+                                                    value="{{ old('fileCommiteeName', session('fileCommiteeName')) }}" onchange="enableUploadInput()" >
+                                                <div style="display:none" id= "errorComitee" class="text-danger"></div>
 
                                             </div>
                                         @endif
@@ -369,7 +367,7 @@
                         <div class="row g-4">
                             <div class="form-group col-12 col-md-6 col-xl-3">
 
-                                <i class="fas fa-download" style="color: green;"></i><a
+                                <i class="fa-solid fa-download" style="color: green;"></i><a
                                     href=" {{ route('downloadDisclosure') }}"
                                     style="color:green; text-decoration: underline; font-style: italic;" onclick="enableUploadInputDisclosure()">
                                     Disclosure Form
@@ -383,7 +381,7 @@
                                             use App\Models\doc_disclosure;
                                         @endphp
                                         @if (doc_disclosure::where('emis', session('emis'))->where('requestType', session('requestType'))->exists())
-                                            <label for="reference-number">Uploaded Disclosure PDF</label>
+                                            <label for="reference-number"><i class="fa-solid fa-upload" style="color: green;"></i>Uploaded Disclosure PDF</label>
                                             @php
                                                 $fileName = doc_disclosure::where('emis', session('emis'))
                                                     ->where('requestType', session('requestType'))
@@ -391,14 +389,13 @@
                                             @endphp
                                             <p> {{ $fileName }} </p>
                                         @else
-                                            <label for="reference-number">Upload Disclosure </label>
+                                            <label for="reference-number"><i class="fa-solid fa-upload" style="color: green;"></i>Upload Disclosure </label>
                                             <div class="input-group">
                                                 <input type="file" name="fileDisclosure" id="fileDisclosureInput"
                                                     required
-                                                    value="{{ old('fileDisclosureName', session('fileDisclosureName')) }}" disabled>
-                                                <div style="display:none" id= "errorDisclosure" class="text-danger">
-                                                    Please
-                                                    select file</div>
+                                                    value="{{ old('fileDisclosureName', session('fileDisclosureName')) }}"   onchange="enableUploadInput()">
+                                                <div style="display:none" id= "errorDisclosure" class="text-danger" >
+                                                 </div>
 
 
 
@@ -420,8 +417,7 @@
                         <br> <br>
                         <div class="col-6 col-md-6 col-xl-2">
                             <input type="submit" id="btnSub" class="btn btn-primary w-100 " onclick="validateFilesAndSubmit()"
-                                value="Request Quotes"  data-bs-toggle="modal" disabled
-                                data-bs-target="#exampleModalProgress">
+                                value="Request Quotes"  >
                         </div>
                         <br> <br>
                     </center>
@@ -441,6 +437,7 @@
         <script>
             $(document).ready(function() {
                 $('.datepicker').datepicker({
+                    format: "dd/mm/yyyy",
                     startDate: new Date() // Set the start date to today
                 });
             });
@@ -461,8 +458,24 @@
 
     function enableUploadInputDisclosure() {
         document.getElementById('fileDisclosureInput').disabled = false;
-        document.getElementById('btnSub').disabled = false;
+       // document.getElementById('btnSub').disabled = false;
 
+
+    }
+
+    function enableUploadInput(){
+        var fileInput = document.getElementById('fileDisclosureInput');
+        var fileCommittee = document.getElementById('fileComiteeInput');
+
+        var submitButton = document.getElementById('btnSub');
+
+        // if ((fileInput.files.length > 0)  && (fileCommittee.files.length > 0)){
+        //     submitButton.disabled = false;
+        //   //  errorComitee.style.display = 'none';
+        // } else {
+        //     submitButton.disabled = true;
+        //   //  errorComitee.style.display = 'block';
+        // }
 
     }
 
@@ -649,6 +662,8 @@
             });
         </script>
            <script>
+
+            
             function setInProgress() {
                 // Show the spinner
                 document.getElementById('spinner').style.display = 'block';
@@ -660,4 +675,13 @@
                 }, 5000);
             }
         </script>
+
+<script>
+    $(document).ready(function() {
+        $(".form-with-modal").submit(function() {
+            // Show the modal when the form is submitted
+            $('#exampleModalProgress').modal('show');
+        });
+    });
+</script>
     @endsection

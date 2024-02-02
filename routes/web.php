@@ -13,7 +13,7 @@ Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-
+Route::post('/updateTextbookSavedItem{ISBN}/{Price}', [\App\Http\Controllers\textbook_cat::class, 'updateTextbookItem'])->name('textbookItemUpdate');
 // Routes for Funds and Procurement
 Route::get('/Funds', [\App\Http\Controllers\Funds::class, 'index'])->name('Funds.index');
 Route::get('/InboxSchool', [\App\Http\Controllers\inboxSchool::class, 'index'])->name('inboxSchool');
@@ -38,10 +38,33 @@ Route::delete('/DeleteQuote', [\App\Http\Controllers\textbook_cat::class, 'quote
 
 //Routes for Stationery Catalogue 
 Route::get('/stationeryCat/{requestType}/{idInbox}', [\App\Http\Controllers\stationery_cat::class, 'index'])->name('stationeryCat');
+
+Route::get('/StationeryAdd',[\App\Http\Controllers\stationery_cat::class, 'AddStationery'])->name('StationeryAddNew');
+Route::post('/AddingStationery',[\App\Http\Controllers\SchoolStationery::class, 'addItemToCart'])->name('addItemToCart');
+
+//For Creating new quote for editing the quantity
+Route::get('/stationeryCatNew/{requestType}/{idInbox}', [\App\Http\Controllers\stationery_cat::class, 'indexNew'])->name('stationeryCatNew');
+
 Route::get('/searchStationery',[\App\Http\Controllers\stationery_cat::class, 'searchStationery'])->name('searchStationery');
+
+Route::get('/searchStationeryNew',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'searchStationeryNew'])->name('searchStationeryNew');
+
+
 Route::post('/stationeryCat/SavedItems', [\App\Http\Controllers\stationery_cat::class, 'saveCheckedItemsStat'])->name('saveCheckedItemsStat');
+
+Route::post('/stationeryCatNew/SavedItems', [\App\Http\Controllers\stationery_cat::class, 'saveCheckedItemsStatNew'])->name('saveCheckedItemsStatNew');
+
+
+Route::post('/stationeryCat/SavedUnit', [\App\Http\Controllers\stationery_cat::class, 'SaveUnitPriceStationery'])->name('SaveUnitPriceStationery');
+
+
 Route::post('/DeleteStationerySavedItem', [\App\Http\Controllers\stationery_cat::class, 'deleteStationeryItem'])->name('StationeryItemDelete');
 Route::post('/SubmitSavedItems', [\App\Http\Controllers\stationery_cat::class, 'submitSavedItems'])->name('submitSavedItems');
+
+
+Route::post('/SubmitSavedItemsNew', [\App\Http\Controllers\stationery_cat::class, 'submitSavedItemsNew'])->name('submitSavedItemsNew');
+
+
  
 Route::post('/generateQuoteStationery', [\App\Http\Controllers\stationery_cat::class, 'generateQuoteStationery'])->name('generateQuoteStationery');
 Route::delete('/DeleteQuoteStationery', [\App\Http\Controllers\stationery_cat::class, 'quoteTextbookDeleteStationery'])->name('quoteTextbookDeleteStationery');
@@ -60,10 +83,12 @@ Route::post('/updateDeliveryDate', [\App\Http\Controllers\ApproveOrder::class, '
 //For District Of Inbox table downloadSignedEF58
 Route::get('/InboxSchoolDistrict', [\App\Http\Controllers\InboxSchoolDistict::class, 'index'])->name('InboxSchoolDistrict');
 Route::get('/Capture/{requestType}/{emis}/{fundsId}', [\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'Capture'])->name('AdminCaptureSupplierOrder');
+
+Route::get('/CaptureUnit/{RequestTypes}/{Emis}/{fundsId}', [\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'CaptureStatUnitPrice'])->name('AdminCaptureStatUnitPrice');
+
 Route::get('/viewSupplierDetails/{itemId}', [\App\Http\Controllers\ViewSupplierDetails::class, 'index'])->name('viewSupplierDetails');
 Route::get('/downloadQuoteAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadQuoteAdmin'])->name('downloadQuoteAdmin');
 Route::get('/downloadSBD4Admin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadSBD4Admin'])->name('downloadSBD4Admin');
-Route::get('/downloadDisclosureAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadDisclosureAdmin'])->name('downloadDisclosureAdmin');
 Route::get('/downloadTaxAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadTaxAdmin'])->name('downloadTaxAdmin');
 Route::get('/downloadSignedEF58',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadSignedEF58'])->name('downloadSignedEF58');
  
@@ -72,13 +97,14 @@ Route::post('/ApproveDeclineRequest',[\App\Http\Controllers\AdminCaptureSupplier
  
 Route::post('/deleteTextbook', [\App\Http\Controllers\textbook_cat::class, 'deleteTextbook'])->name('deleteTextbook');
 
-
-
+Route::get('/downloadCheckList/{emis}/{requestType}',[\App\Http\Controllers\InboxSchoolDistict::class, 'downloadCheckList'])->name('downloadCheckList');
+Route::post('/DeclineRequest',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'DeclineRequest'])->name('DeclineRequest');
+Route::post('/GenerateChecklistApprove',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'GenerateChecklistApprove'])->name('GenerateChecklistApprove');
 
 
 Route::post('/deleteTextbook', [\App\Http\Controllers\textbook_cat::class, 'deleteTextbook'])->name('deleteTextbook');
 
-Route::get('/view-quotes',[\App\Http\Controllers\textbook_cat::class, 'viewQuotess'])->name('viewQuotess');
+Route::get('/view-quotes',[\App\Http\Controllers\textbook_cat::class, 'viewQuotes'])->name('viewQuotes');
 Route::get('/ShowPdfs',[\App\Http\Controllers\textbook_cat::class, 'ShowPdf'])->name('ShowPdfs');
 Route::get('/genpdfE',[\App\Http\Controllers\textbook_cat::class, 'genPdfExample'])->name('genPdfExample');
 
@@ -154,16 +180,23 @@ Route::get('/download_OrderLetter',[\App\Http\Controllers\ApproveOrder::class, '
 
 
        Route::post('/submitSavedItemsForTextBook', [\App\Http\Controllers\AdminDeliveryController::class, 'submitSavedItemsForTextBook'])->name('submitSavedItemsForTextBook');
+       Route::get('/downloadQuoteSupplier/{supplierID}',[\App\Http\Controllers\SuppliyerController::class, 'downloadQuoteSupplier'])->name('downloadQuoteSupplier');
 
-
-
+       Route::get('/downloadSBD4Supplier/{supplierID}',[\App\Http\Controllers\SuppliyerController::class, 'downloadSBD4Supplier'])->name('downloadSBD4Supplier');
        // Recieve Quotes submitSuppliers CaptureSuppliers  
 Route::get('/receiveQuotes/{requestType}', [\App\Http\Controllers\Receive_Quote::class, 'index'])->name('receiveQuotes');
 Route::post('/RecieveQuotes/SubmitSuppliers', [\App\Http\Controllers\Receive_Quote::class, 'submitSuppliers'])->name('submitSuppliers');
 Route::get('/captureSuppliersPage/{itemId}', [\App\Http\Controllers\captureSupplierDetails::class, 'index'])->name('captureSuppliersPage');
 Route::post('/RecieveQuotes/updateRecommended', [\App\Http\Controllers\Receive_Quote::class, 'updateRecommended'])->name('updateRecommended');
+
+Route::post('/updateDeviationReason', [\App\Http\Controllers\Receive_Quote::class, 'updateDeviationReason'])->name('updateDeviationReason');
+
+
 Route::post('/RecieveQuotes/CaptureSuppliers', [\App\Http\Controllers\Receive_Quote::class, 'CaptureSuppliers'])->name('CaptureSuppliers');
 Route::get('/download_EF58',[\App\Http\Controllers\Receive_Quote::class, 'downloadEF58'])->name('downloadEF58');
+
+Route::get('/downloads_EF58',[\App\Http\Controllers\Receive_Quote::class, 'downloadEF58New'])->name('downloadEF58New');
+
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', function () {
@@ -180,7 +213,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('furniture-replacement-search', [\App\Http\Controllers\Admin\Collection\CollectionRequestController::class, 'search']);
 
 
-    Route::get('TransactionSearch', [\App\Http\Controllers\AdminDeliveryController::class, 'searchRequest']);
+    Route::get('/TransactionSearch', [\App\Http\Controllers\AdminDeliveryController::class, 'searchRequest']);
+
+    Route::get('/TransactionSearchView', [\App\Http\Controllers\AdminDeliveryController::class, 'searchRequestView']);
+
     //Route::get('/searchStationeryAdmin',[\App\Http\Controllers\AdminDeliveryController::class, 'searchStationeryAdmin'])->name('searchStationeryAdmin');
 
 
@@ -208,6 +244,10 @@ Route::group(['middleware' => ['auth']], function () {
    
 
    Route::get('/notification', [\App\Http\Controllers\Notification::class, 'index'])->name('notification');
+
+   Route::get('/inbox-search', [\App\Http\Controllers\Notification::class, 'searches'])->name('inbox-search');
+
+   
 
 
    //Route::post('/Funds', [\App\Http\Controllers\RequestFundsController::class, 'InsertTextbookFunds'])->name('request.funds');
@@ -263,8 +303,11 @@ Route::group(['middleware' => ['auth']], function () {
 Route::get('/InboxSchoolDistrict', [\App\Http\Controllers\InboxSchoolDistict::class, 'index'])->name('InboxSchoolDistrict');
 Route::get('/viewSupplierDetails/{itemId}', [\App\Http\Controllers\ViewSupplierDetails::class, 'index'])->name('viewSupplierDetails');
 Route::get('/downloadQuoteAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadQuoteAdmin'])->name('downloadQuoteAdmin');
-Route::get('/downloadSBD4Admin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadSBD4Admin'])->name('downloadSBD4Admin');
 Route::get('/downloadDisclosureAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadDisclosureAdmin'])->name('downloadDisclosureAdmin');
+
+
+
+
 Route::get('/downloadTaxAdmin/{fileName}',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadTaxAdmin'])->name('downloadTaxAdmin');
 Route::get('/downloadSignedEF58',[\App\Http\Controllers\AdminCaptureSupplierOderController::class, 'downloadSignedEF58'])->name('downloadSignedEF58');
 

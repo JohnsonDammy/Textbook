@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'History Requests')
+@section('title', 'Manage Inbox')
 @section('content')
     <main>
        
@@ -53,21 +53,29 @@
                                            
                                            
                                            
-                                            <a class="myModalLink"  style="color:green; text-decoration: underline; font-style:italic"
+                                            <a 
+                                            @if($item->activity_name == "Request Quote") class="myModalLink" @endif 
+                                            style="color:green; text-decoration: underline; font-style:italic"
                                             @if($item->activity_name == "Create Quote")
+                                              
                                                 @if($item->requestType == "Textbook")
                                                 href="{{ route('textbookCat', ['requestType' => $item->requestType , 'idInbox' =>$item->Id ]) }}"
                                                 @else
                                                 href="{{ route('stationeryCat', ['requestType' => $item->requestType , 'idInbox' =>$item->Id ]) }}"
                                                 @endif
                                             @elseif($item->activity_name == "Request Quote")
+                                            
                                                 @if (session('countSuppliers') < 3 || session("countComitee") < 1)
                                                     href="#"
                                                 @else
                                                 href="{{ route('chooseSupplier', ['requestType' => $item->requestType, 'MinQuotes' => 'None']) }} "
                                                 @endif
-                                      
+                                            
+                                            @elseif($item->activity_name == "Create New Quote")
+                                            href="{{ route('stationeryCatNew', ['requestType' => $item->requestType , 'idInbox' =>$item->Id ]) }}"
+
                                             @else
+                                          
                                             href="{{ route('receiveQuotes', ['requestType' => $item->requestType ]) }} "
                                             @endif
                                              class="toggleLink" data-toggle="{{ $item->Id }}">{{ $item->activity_name }}  </a>
@@ -87,6 +95,7 @@
                 </div>
             </div>
 
+           
              {{-- Model Indicating suppliers and comitees info need to be filled out --}}
              <div class="modal fade" id="exampleWarning" tabindex="-1" aria-labelledby="exampleModalLabel"
              aria-hidden="true">
@@ -95,9 +104,9 @@
                      <div class="modal-body">
                          <div class="text-center">
                              <img src="{{ asset('img/confirmation-popup-1.svg') }}" class="img-fluid mb-5">
-                             <h4 class="modal-title">Suppliers and Comitee members</h4>
-                             <p class="modal-title_des">Please ensure you added  suppliers and comitee members to proceed to next
-                                 step
+                             <h4 class="modal-title"></h4>
+                             <p class="modal-title_des">
+                                Please setup supplier and/or commitee members 
                              </p>
                          </div>
 
@@ -117,11 +126,8 @@
              $('.myModalLink').click(function (event) {
               
         
-                 // Your condition to show the modal
-              
-        
                  // Show the modal if the condition is true
-                 @if (session('countSuppliers') < 3 || session("countComitee") < 1) {
+                 @if ((session('countSuppliers') < 3 || session("countComitee") < 1 ) ) {
                      $('#exampleWarning').modal('show');
                  }
                  @endif
@@ -130,4 +136,4 @@
              });
          </script>
  
-            @endsection
+            @endsection

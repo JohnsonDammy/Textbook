@@ -1,4 +1,3 @@
-
 @php
 $totalLoops = 0;
 $totalPrice=0;
@@ -57,7 +56,7 @@ $remainderRows = $dataSavedTextbook->count() % 15;
 
     }
     .anotherT{
-        margin-top: -386px;
+        margin-top: -391px;
         margin-left: 1110px;
         
         width:400px;
@@ -196,18 +195,18 @@ $remainderRows = $dataSavedTextbook->count() % 15;
     <tr>
         <th colspan="4"><label class="txt">SECTION B(1) </label></th>
     </tr>
-    <tr><th> <label class="txt">ISB NO./ITEM NO.</label></th> <th><label class="txt">TEXTBOOK/STATIONERY ITEM DESCRIPTION</label></th><th><label class="txt">UNIT</label></th><th><label class="txt">QTY</label></th></tr>
+    <tr><th> <label class="txt">ISB NO./ITEM NO.</label></th>  <th><label class="txt">TEXTBOOK/STATIONERY ITEM DESCRIPTION</label></th>  <th><label class="txt">QTY</label></th></tr>
    
    
     @foreach ($chunk as $item)
     @php
           $price = (float) str_replace(['R', ',', ' '], '', $item->Price);
-         $totalPrice=$totalPrice +  $item->TotalPrice;
+         $totalPrice= $totalPrice +  $item->TotalPrice;
     @endphp
  
  
    
-    <tr><td><label class="Test"> &nbsp;{{  $item->ISBN }}</label></td><td><label class="Test">&nbsp; {{  $item->Title }}</label></td><td><label class="Test">&nbsp; R {{ number_format($price, 2, '.', ',') }}</label></td><td><label class="Test">&nbsp;{{  $item->Quantity }}</label></td></tr>
+    <tr><td><label class="Test"> &nbsp;{{  $item->ISBN }}</label></td><td><label class="Test">&nbsp; {{  $item->Title }}</label></td> <td  colspan="2" ><label class="Test">&nbsp; </label><label class="Test">&nbsp;{{  $item->Quantity }}</label></td></tr>
     @endforeach
  
     @if($totalLoops == $totalChunks && $remainderRows != 0)
@@ -216,7 +215,7 @@ $remainderRows = $dataSavedTextbook->count() % 15;
     @endphp
  
      @for ($i = 1; $i <= $additionalRows; $i++)
-     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp; </td><td>&nbsp;</td></tr>
+     <tr><td>&nbsp;</td><td>&nbsp;</td><td colspan="2" >&nbsp; </td></tr>
      @endfor
    @endif
     </table>
@@ -225,10 +224,10 @@ $remainderRows = $dataSavedTextbook->count() % 15;
  
     <table  border="1" class="anotherT table" >
         <tr>
-            <th colspan="4"> <label class="txt">SECTION B(1)</label></th>
+            <th colspan="4"> <label class="txt">SECTION B(2)</label></th>
         </tr>
         <tr>
-            <th colspan="2"><label class="txt">UNIT PRICE</label></th> <th colspan="2"><label class="txt">TOTAL VALUE</label></th>
+            <th colspan="2"><label class="txt">UNIT PRICE</label></th><th >&nbsp;TOTAL PRICE</th>
         </tr>
         @php
            $count =1;
@@ -236,12 +235,8 @@ $remainderRows = $dataSavedTextbook->count() % 15;
         @foreach ($chunk as $item)
         <tr>
            
-           
-            <td>&nbsp; {{--  R {{ number_format($item->TotalPrice, 2, '.', ',') }} --}}</td><td>&nbsp;</td><td>&nbsp;
-                {{--  @if( $totalLoops == $totalChunks && $count == 1)  
-                  R {{ number_format($totalPrice, 2, '.', ',') }}
-                  @endif --}}
-           </td><td>&nbsp;</td>
+         
+           <td  colspan="2"  style="text-align: right">&nbsp;   R {{ number_format( $price, 2, '.', ',') }}</td> <td style="text-align: right">&nbsp; R {{ number_format( $item->TotalPrice, 2, '.', ',') }}</td>
            
  
         </tr>
@@ -255,15 +250,15 @@ $remainderRows = $dataSavedTextbook->count() % 15;
             $additionalRows = 15-$remainderRows;
         @endphp
    
-         @for ($i = 1; $i <= $additionalRows; $i++)
+         @for ($i = 2; $i <= $additionalRows; $i++)
          <tr>
-            <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+            <td  colspan="2" >&nbsp;</td> <td >&nbsp;</td>
         </tr>
          @endfor
        @endif
 
         <tr>
-            <td colspan="2"><label class="txt">TOTAL OF ALL PAGES</label></td><td>&nbsp;</td><td>&nbsp;</td>
+            <td colspan="2"><label class="txt">TOTAL AMOUNT</label></td><td style="text-align: right;">&nbsp;  @if($totalLoops == $totalChunks) R {{ number_format($totalPrice, 2, '.', ',') }}@endif</td>
    
         </tr>
     </table>
@@ -307,8 +302,6 @@ $remainderRows = $dataSavedTextbook->count() % 15;
  
  
     </html>
-   
- 
    
  
 @endforeach

@@ -14,7 +14,7 @@ class inbox_school extends Model
     protected $table = "inbox_school";
 
   
-    protected $fillable=['Id','requestType', 'allocation','status', 'activity_name','funds_request_id'];
+    protected $fillable=['Id','requestType', 'allocation','status', 'activity_name','funds_request_id', 'ReworkComment'];
 
     //get user details organization wise , defining relations
 }

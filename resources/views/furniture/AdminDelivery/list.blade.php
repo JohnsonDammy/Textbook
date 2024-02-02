@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'School delivery List')
+@section('title', 'School delivery list')
 @section('content')
 
     @php
@@ -14,7 +14,7 @@
             <div class="row align-items-center">
                 <div class="col-12 col-md-4">
                     <div class="page-titles">
-                        <h4>School Delivery Lists </h4>
+                        <h4>School Delivery lists </h4>
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                             {{-- <li class="breadcrumb-item"><a href="{{ route('school-maintenance') }}">School Maintenance</a></li> --}}
@@ -36,17 +36,17 @@
                         <div class="col-12 col-md-6 col-xl-6">
                             <input type="text" class="form-control search-input rounded-0" name="school_name" placeholder="School Name">
                         </div>
-                        <div class="col-12 col-md-6 col-xl-3">
+                        {{-- <div class="col-12 col-md-6 col-xl-3">
                             <select class="form-select form-control rounded-0" name="status_id" aria-label="Default select example">
                                 <option selected value="">Status</option>
                                 <option value="Complete">Complete</option>
                                 <option value="Pending">Pending</option>
 
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="col-12 col-md-6 col-xl-3">
-                            <select class="form-select form-control rounded-0" name="RequestType" aria-label="Default select example">
+                            <select class="form-select form-control rounded-0" name="RequestType" aria-label="Default select example" >
                                 <option selected value="">Request Type</option>
                                 <option value="Textbook">Textbook</option>
                                 <option value="Stationery">Stationery</option>
@@ -55,7 +55,7 @@
                         </div>
              
                         <div class="col-12 col-md-6 col-xl-3">
-                            <input type="text" class="form-control rounded-0" name="emis" placeholder="EMIS Number">
+                            <input type="text" class="form-control rounded-0" name="emis" placeholder="EMIS Number" >
                         </div>
                         <div class="col-6 col-md-6 col-xl-1 text-end">
 
@@ -210,7 +210,6 @@
                                         {{ Str::limit('O / A', 40) }}
                                     </div></th>
                                     <th>Status</th>
-                               
 
                                     <th>Manage</th>
                                 </tr>
@@ -241,8 +240,19 @@
                                             @endphp
                                             <td>
 
-
+                                                @if ($delivery->RequestType === "Textbook")
                                                 R {{ number_format($orderedAmtValue, 2, '.', ',') }}
+
+                                                @else
+
+                                                {{-- // $OrdAmountSum = savedstationeryitems::where('school_emis', session('Newemis'))
+                                                // ->sum('TotalPrice'); --}}
+                                                @php
+                                                    $OrdAmountSum = $AllOrderAmount ->where('school_emis', $delivery->emis)->sum('TotalPrice')
+                                                @endphp
+                                                R {{ number_format($OrdAmountSum, 2, '.', ',') }}
+
+                                                @endif
 
                                             </td>
                                             @php
@@ -267,7 +277,14 @@
                                                      @if($sumDeliveryAmt==0) 
                                                        N/A
                                                      @else
-                                                    R {{ number_format($orderedAmtValue-$sumDeliveryAmt, 2, '.', ',') }}
+                                                        @if ($delivery->RequestType === "Textbook")
+                                                        R {{ number_format($orderedAmtValue-$sumDeliveryAmt, 2, '.', ',') }}
+
+                                                        @else
+                                                        R {{ number_format($OrdAmountSum-$sumDeliveryAmt, 2, '.', ',') }}
+
+                                                        @endif
+
                                                     @endif
                                                 </span>
 
@@ -295,6 +312,7 @@
 
                                             <td>
                                                 <form class="" method="get"
+
                                                     action="{{ route('CaptureDataDelivery', ['refNo' => $delivery->References_Number, 'requestType' => $delivery->RequestType, 'idInbox' => '1', 'emis_new' => $delivery->emis]) }}">
                                                     <input type="hidden" name="emis"
                                                         value="{{ ucwords($delivery->emis) }}">

@@ -8,8 +8,22 @@
         $totalLoops = 0;
         $totalPriceForSchool = 0;
         $totalPriceCapturedQuantity = 0;
+        $totalCapturedQuantity =0;
+
         $statement = '';
+        $totalQuantityStat =0;
     @endphp
+
+{{-- @php
+$totalLoops = 0;
+$totalPriceForSchool = 0;
+$totalPriceCapturedQuantity = 0;
+$statement = '';
+$OutStandingAmount = 0;
+$totalPriceCapturedQuantityNew = 0;
+@endphp --}}
+
+
     <main>
 
         <style>
@@ -161,9 +175,7 @@
 
             <div class="tabs">
 
-                <a href="#" class="tab-link {{ session('activeTab') == 'tab1' ? 'active' : '' }}" data-tab="tab1"
-                    data-toggle="1">Capture Delivery Note</a>
-
+        
                 <a href="#" class="tab-link active {{ session('activeTab') == 'tab2' ? 'active' : '' }}"
                     data-tab="tab2" data-toggle="2">Stationery Catalogue</a>
 
@@ -173,46 +185,7 @@
 
                 <!-- Your tab content here -->
 
-                <div class="tab-content" data-toggle="1" id="tab1">
-
-                    <table class="table">
-                        <tr>
-                            <th>ID</th>
-                            <th>RequestType</th>
-                            <th>Delivery Note</th>
-                            <th>Date</th>
-                        </tr>
-                        @if (count(session('dataNewStat')) < 1)
-
-                            <tr class="text-center text-dark">
-                                <td colspan="7">No Delivery Note Found</td>
-                            </tr>
-                            </tbody>
-                        @else
-                            @foreach (session('dataNewStat') as $key => $delivery)
-                                <tbody>
-                                    <td>{{ $delivery->Id }}</td>
-                                    <td>{{ $delivery->RequestType }}</td>
-
-                                    <td>
-                                        @if ($delivery->FilePath)
-                                            <a href="{{ asset('public/Delivery/' . $delivery->FilePath) }}" download>
-                                                <i class="fa fa-download"></i> Download File
-                                            </a>
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
-
-                                    <td>{{ $delivery->date }}</td>
-
-                                </tbody>
-                            @endforeach
-                        @endif
-
-                    </table>
-                </div>
-
+             
                 <div class="tab-content " data-toggle="2" id="tab2" id="textbooks-container">
                     <div class="col-12 col-md-12 my-3">
 
@@ -227,26 +200,18 @@
                         <form action="{{ route('searchStationeryAdmin') }}" method="get">
                             <div class="row justify-content-center align-items-center g-4">
 
-
-
                                 <div class="form-group col-12 col-md-6 col-xl-3">
                                     <input type="text" name="searchKeyword" class="form-control form-control-sm"
                                         value=" {{ old('searchWord', $searchWord) }}" placeholder=" ">
                                     <label>Enter a keyword</label>
-
-
                                 </div>
 
-
-
-
-
-
+{{-- 
                                 <div class="col-3 col-sm-6 col-xl-1" style=" max-width: 4%">
                                     <a type="reset"
                                         href="{{ route('CaptureData', ['requestType' => 'Stationery', 'idInbox' => '1', 'emis_new' => session('Newemis')]) }}"
                                         class="text-decoration-underline" value="Clear">Clear</a>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-6 col-sm-9 col-xl-2">
                                     <input type="submit" class="btn btn-primary w-100"
@@ -268,21 +233,24 @@
                                 </div>
                             @endif
                         @endif --}}
+
+
                         <form id="saveItemsForm" action="{{ route('saveCheckedItemsStatStionery') }}" method="post">
                             @csrf
                             <input type="hidden" name="UncheckedItems" value="">
 
                             <div>
+                                <center>  <span id="EllaEatBreatAndSource" style="color: red; display:none;">Execeeded expected quantity</span></center>
+
                                 <table class="table">
                                     <thead>
                                         <tr>
-
                                             <th> </th>
                                             <th> Code </th>
                                             <th> Name </th>
                                             <th> Unit Price</th>
-                                            <th> Quantity </th>
-                                            <th>Captured Quantity </th>
+                                            <th> Ordered Quantity </th>
+                                            <th>Delivered Quantity </th>
 
                                         </tr>
                                     </thead>
@@ -300,14 +268,11 @@
                                             @foreach (session('stationeryCat') as $item)
                                                 <tr class="pt-1 px-1">
                                                     <td>
-
                                                         <input type="checkbox" class="checkbox"
                                                             id="Checkbox_{{ $item->Id }}" name="selectedItems[]"
-                                                            @if (session('dataSavedStationery')->contains('ItemCode', $item->item_code)) @if (session('dataSavedStationery')->where('Emis', session('Newemis'))) checked @endif
-                                                            @endif
 
                                                         value="{{ $item->Id }}"
-                                                        @if (session('quoteStatus') == 'Quote Created') disabled @endif>
+                                                       >
 
                                                     </td>
                                                     <td> {{ $item->item_code }} </td>
@@ -317,49 +282,61 @@
                                                         </div>
 
                                                     </td>
-                                                    <td>100,00</td>
+                                                    @php
+                                                    $deliveredQuantity= $item->Quantity ;
+                                                    $totalCapturedQuantity=  session('allStationaryItemsSaved')->where('ItemCode', $item->item_code)->sum('Captured_Quantity');
+                                                @endphp
+
+                                                    <td>R {{ number_format($item->price, 2, '.', ',') }}</td>
 
                                                     <td>
 
                                                         <input type="number"
-                                                            class="form-control input-sm quantity-input input"
+                                                            class="form-control input-sm quantity-input"
                                                             name="selectedQuantities[{{ $item->Id }}]"
                                                             id="Quantity_{{ $item->Id }}"
                                                             style="box-shadow: 0 0 0 0.25rem #7cbf7a; width: 60px; height: 20px;"
                                                             min="0" required
-                                                            @if (session('dataSavedStationery')->contains('ItemCode', $item->item_code)) @if (session('dataSavedStationery')->where('Emis', session('Newemis'))) checked @endif
-                                                            @endif
+                                                
 
                                                         value="{{ $item->Quantity }}">
 
 
                                                         </span>
-
-
+                                                        @php
+                                                        //  $totalQuantity = $item->Quantity;
+  
+                                                          $totalQuantityStat += $item->Quantity;
+  
+                                                        // or {{$totalQuantity}} if this is within a Blade template
+                                                         @endphp
                                                     </td>
 
                                                     <td><input type="number"
                                                             class="form-control input-sm quantity-input input"
                                                             name="CaptureQuantity[{{ $item->Id }}]"
                                                             id="Quantity_{{ $item->Id }}"
+
+                                                            onblur="validateInput(this)"
+                                                            oninput="highlightIfMax(this, {{ $item->Quantity }}, {{ $totalCapturedQuantity }}, {{ $deliveredQuantity }}, event);"
                                                             style="box-shadow: 0 0 0 0.25rem #7cbf7a; width: 60px; height: 20px;"
-                                                            min="0"
-                                                            @if (session('dataSavedStationery')->contains('ItemCode', $item->item_code)) @if (session('dataSavedStationery')->where('Emis',session('Newemis')) )
-                                                        value="{{ session('dataSavedStationery')->where('ItemCode', $item->item_code)->first()->Captured_Quantity }}" checked @endif
-                                                            @endif
-                                                        @if (session('dataSavedStationery')->contains('ItemCode', $item->item_code)) enabled 
-                                                    @else
-                                                        disabled @endif
+                                               
+                                               
                                                         ></td>
-
-
 
 
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     @endif
+
+                                    @php
+                                       session(['totalQuantityStat' => $totalQuantityStat ]);
+                                     //  echo session('totalQuantityStat')
+                                    @endphp
                                 </table>
+
+                                
                                 <style>
                                     .pagination-wrap a {
                                         margin-right: -70px;
@@ -410,17 +387,45 @@
                                     </center>
                                 </div>
 
+                       
                                 <center>
+                                    {{-- <div class="card" id="minQuotesSelection">
+                                        <h5 class="card-header" style =" color:#14A44D">Check for final capture </h5>
+                                        <div class="card-body">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio"
+                                                    name="inlineRadioOptions" id="inlineRadio2" value="Yes">
+                                                <label class="form-check-label" for="inlineRadio2">Final
+                                                    Capture</label>
+                                            </div>
+                                            <br>
+                                        </div>
+                                    </div> --}}
+                                   </div>
+
                                     <div class="row justify-content-center align-items-center g-4"
                                         style="margin-right: -90px;">
                                         <div class="col-6 col-md-6 col-xl-2">
-                                            <input type="submit" id="submitFormButton" class="btn btn-primary btn-sm"
-                                                value="Save & Continue" @if (session('quoteStatus') == 'Quote Created') disabled @endif>
+                                            <input type="hidden" id="preventSubmission" name="preventSubmission" value="">
+                                            <input  type="submit" id="submitFormButton"
+                                                class="btn btn-primary btn-sm" value="Save & Continue"
+                                                @if (session('quoteStatus') == 'Quote Created') disabled @endif><br>
 
                                         </div>
-                                    </div>
-                                </center>
 
+
+                                        {{-- <div class="row justify-content-center align-items-center g-4"
+                                        style="margin-right: -90px;">
+                                        <div class="col-6 col-md-6 col-xl-2">
+                                            <input type="submit" id="submitFormButton" class="btn btn-primary btn-sm"
+                                                value="Save & ContinueS" @if (session('quoteStatus') == 'Quote Created') disabled @endif>
+
+                                        </div>
+                                    </div> --}}
+                                    </div>
+                        </div>
+
+                            </center>
                             </div>
 
                         </form>
@@ -457,12 +462,28 @@
                                             <th> Code </th>
                                             <th>Title</th>
                                             <th>Price</th>
-                                            <th>Quantity</th>
-                                            <th>Capture Quantity</th>
+                                            <th>    
 
-                                            @if (session('quoteStatus') != 'Quote Created')
+                                                <div class="short-text" title="Ordered Quantity">
+                                                    {{ Str::limit('O / Q', 40) }}
+                                                </div>
+
+                                            </th>
+                                            <th>
+                                                
+                                                {{-- Capture Quantity --}}
+                                                <div class="short-text" title="Delivered Quantity">
+                                                    {{ Str::limit('D / Q', 40) }}
+                                                </div>
+                                            </th>
+
+                                            <th>
+                                                <div class="short-text" title="Remaining Quantity">
+                                                    {{ Str::limit('R / Q', 40) }}
+                                                </div>
+                                            </th>
+
                                                 <th> Action </th>
-                                            @endif
                                         </tr>
                                     </thead>
 
@@ -478,17 +499,52 @@
                                         <tbody>
                                             @foreach (session('dataSavedStationery') as $item)
                                                 <tr>
-
+                                                    @php
+                                                    $UnitPrices = (float) str_replace(['R', ',', ' '], '', $item->UnitPrices);
+                                                    @endphp 
                                                     <td> {{ $item->ItemCode }} </td>
                                                     <td> {{ $item->Item }} </td>
-                                                    {{-- {{ $item->UnitPrices }} --}}
-                                                    <td> {{ $dummyPrice }} </td>
-                                                    <td> {{ $item->Quantity }} </td>
+                                                    <td> 
+                                                        {{-- {{ $item->UnitPrices   }}   --}}
+                                                        R {{ number_format($item->UnitPrices, 2, '.', ',') }}
+                                                    </td>
+                                                    <td> {{ $item->Quantity }} </td> 
                                                     {{-- @php
                                                         $TotalAccumalated = $TotalAccumalated + $item->TotalPrice;
                                                     @endphp
                                                     <td> R {{ number_format($item->TotalPrice, 2, '.', ',') }} </td> --}}
-                                                    <td>{{ $item->Captured_Quantity }}</td>
+                                                    {{-- <td>{{ $item->Captured_Quantity }}</td> --}}
+
+                                                    @php
+                                                    $price = (float) str_replace(['R', ',', ' '], '',  $item->UnitPrices);
+                                                    $Quantity = $item->Quantity;
+                                                    $totalPriceForSchool = $price * $Quantity;
+
+                                                    $totalDeliveredQuantity=  session('allStationaryItemsSaved')->where('ItemCode', $item->ItemCode)->sum('Captured_Quantity');
+
+                                                    @endphp
+                                                     <td>
+                                                        {{ $totalDeliveredQuantity}}  
+                                                    </td> 
+
+                                                    @php
+                                                    $price = (float) str_replace(['R', ',', ' '], '', $item->Price);
+                                                    $Quantity = $item->Captured_Quantity;
+                                                    $totalPriceCapturedQuantity =   $totalPriceCapturedQuantity +$price * $Quantity;
+
+                                                    $RealQuantity = $item->Quantity;
+                                                    $CapturedQuantity = $item->Captured_Quantity;
+
+                                                    $totalCapturedQuantitys=  session('allStationaryItemsSaved')->where('ItemCode', $item->ItemCode)->sum('Captured_Quantity');
+
+
+
+                                                    $OutStandingAmount = $RealQuantity - $totalCapturedQuantitys;
+                                                @endphp
+
+                                                    <td><span style="color: red">{{ $OutStandingAmount }} </span></td> 
+
+
 
                                                     @if (session('quoteStatus') != 'Quote Created')
                                                         <td>
@@ -535,163 +591,35 @@
 
 
                                     </tbody>
-                                    <center><label><b>School Total Amount: </b> <b
+                                    {{-- <center><label><b>School Total Amount: </b> <b
                                                 style="color:blue">R{{ $totalPriceForSchool }}</b> </label> &nbsp; &nbsp;
                                         <label><b>Total Captured Quantity Amount:</b> <b
                                                 style="color:green">R{{ $totalPriceCapturedQuantity }}</b> &nbsp; &nbsp;
-                                            <label><b>Statement:</b> <b style="color:red">{{ $statement }}</b></label>
+                                            <label><b>Statement:</b> <b style="color:red">{{ $statement }}</b></label> --}}
 
                                 </table>
 
+                        
 
                                 <center>
 
                                     @if (count($dataSavedStationery) > 1)
-                                        {{--    <table class="table">
-                                            <thead>
-                                                <tr>
-
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <th> Action </th>
-                                                    @endif
-                                                  
-                                                    <th>View</th>
-                                                  
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <th>Status</th>
-                                                    @endif
-                                                    <th>Number Of Pages</th>
-                                                    <th>Total </th>
-
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <th>Delete</th>
-                                                    @endif
-
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr class="pt-1 px-1">
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <td>
-                                                        <form action=" {{ route('generateQuoteStationery') }} "
-                                                            method="post" onsubmit="setInProgress()">
-                                                            @csrf
-                                                            <input type="submit" class="buttonGenerate"
-                                                                data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                                @if (session('quoteStatus') == 'Quote Created' || session('status') == 'Generated') disabled @endif
-                                                                value="Generate Quote">
-                                                        </form>
-
-
-
-
-                                                        <!-- Progress Bar -->
-
-                                                    </td>
-                                                    @endif
-
-                                                    <td>
-                                                        <a href="{{ route('viewQuotesStat') }}" target="_blank"
-                                                            style="color: @if (session('quoteStatus') == 'Quote Created' || session('status') == 'Generated') green @else grey @endif;
-                                                          text-decoration: underline; font-style: italic;
-                                                          @if (session('quoteStatus') != 'Quote Created' && session('status') != 'Generated') pointer-events: none; @endif">
-                                                            View Quote
-                                                        </a>
-
-
-                                                    </td>
-
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <td>
-                                                     
-                                                        @php
-                                                            if (session('status') != 'Generated') {
-                                                                session(['status' => 'Not Generated']);
-                                                            }
-
-                                                        @endphp
-                                                        <p id="statusParagraph"> {{ session('status') }} </p>
-
-
-                                                    </td>
-                                                    @endif
-
-                                                    <td>
-
-                                                        @if (session('status') != 'Generated')
-                                                            <p> 0 </p>
-                                                        @else
-                                                            <p> {{ session('pages') }} </p>
-                                                        @endif
-
-
-
-                                                    </td>
-
-
-                                                    <td class="col-md"
-                                                        style="color: {{ $TotalAccumalated > session('AllocatedAmt') ? 'red' : 'green' }}">
-                                                        R {{ number_format($TotalAccumalated, 2, '.', ',') }}
-                                                    </td>
-
-                                                    @if (session('quoteStatus') != 'Quote Created')
-                                                    <td>
-                                                        <form action="{{ route('quoteTextbookDeleteStationery') }} "
-                                                            method="POST">
-                                                            <input type="hidden" name="_method" value="DELETE">
-                                                            <input type="hidden" name="_token"
-                                                                value="{{ csrf_token() }}">
-
-                                                            <button class="btn-reset" type="button"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#exampleModal{{ $item->id }}">
-                                                                <i class="ri-delete-bin-7-fill"></i>
-                                                            </button>
-
-                                                            <div class="modal fade" id="exampleModal{{ $item->id }}"
-                                                                tabindex="-1" aria-labelledby="exampleModalLabel"
-                                                                aria-hidden="true">
-                                                                <div
-                                                                    class="modal-dialog modal-dialog-centered popup-alert">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-body">
-                                                                            <div class="text-center">
-                                                                                <img src="{{ asset('img/confirmation-popup-1.svg') }}"
-                                                                                    class="img-fluid mb-5" alt="">
-                                                                                <h4 class="modal-title">Delete</h4>
-                                                                                <p class="modal-title_des">Are you sure you
-                                                                                    want to delete?</p>
-                                                                            </div>
-
-                                                                        </div>
-                                                                        <div
-                                                                            class="modal-footer justify-content-around text-center">
-                                                                            <button type="button"
-                                                                                class="btn btn--dark px-5"
-                                                                                data-bs-dismiss="modal">No</button>
-                                                                            <button type="submit"
-                                                                                class="btn btn-primary px-5">Yes</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </td>
-                                                    @endif
-                                                </tr>
-                                            </tbody>
-                                        </table> --}}
                                     @endif
 
                                     <form id="saveItemsForm" action="{{ route('submitSavedItems') }}" method="post">
                                         @csrf
 
-                                        <button @if (session('quoteStatus') == 'Quote Created' || count($dataSavedStationery) < 1) disabled @endif
+                                        {{-- <button @if (session('quoteStatus') == 'Quote Created' || count($dataSavedStationery) < 1) disabled @endif
                                             class="btn btn-primary btn-sm" id="sumitbuttton" type="button"
                                             data-bs-toggle="modal" data-bs-target="#exampleModal5">
-                                            SUMBIT
-                                        </button>
+                                            SUMBITssss
+                                        </button> --}}
+
+                                        <div class="col-6 col-md-6 col-xl-2">
+                                            <u><a href="{{ route('AdminDelivery.list') }}" >Continue Capture Delivery</a></u>
+        
+        
+                                        </div>
 
                                         <div class="modal fade" id="exampleModal5" tabindex="-1"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -728,7 +656,7 @@
         </div>
 
 
-        <script>
+        {{-- <script>
             function validateInput(input) {
 
                 var value = input.value;
@@ -743,7 +671,7 @@
                 }
 
             }
-        </script>
+        </script> --}}
 
         <script>
             function setInProgress() {
@@ -834,7 +762,7 @@
 
         {{-- Only enable quantities  when checked  --}}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
+        {{-- <script>
             $(document).ready(function() {
 
                 // Listen for changes in the checkbox state
@@ -851,7 +779,46 @@
                     }
                 });
             });
-        </script>
+        </script> --}}
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function highlightIfMax(inputElement, max, totalCapturedQuantity, deliveredQuantity, event) {
+        var inputValue = parseInt(inputElement.value, 10);
+        var totCapturedSecondAmt = inputValue + totalCapturedQuantity;
+
+
+
+        // Check if the input value exceeds the maximum or totalCapturedQuantity exceeds deliveredQuantity
+        if (inputValue > max || totCapturedSecondAmt > deliveredQuantity) {
+            inputElement.style.boxShadow = "0 0 0 0.25rem #ff0000";
+            document.getElementById("preventSubmission").value = "true";
+            //alert('Code')
+            //document.querySelector('form[name="saveItemsForm"] input[type="submit"]').disabled = true;
+            document.getElementById("EllaEatBreatAndSource").style.display = 'block';
+
+            document.getElementById("submitFormButton").disabled = true;
+        } else {
+            inputElement.style.boxShadow = "0 0 0 0.25rem #7cbf7a";
+            document.getElementById("preventSubmission").value = "false";
+            document.getElementById("submitFormButton").disabled = false;
+            document.getElementById("EllaEatBreatAndSource").style.display = 'none';
+
+        }
+    }
+
+    function submitForm() {
+        var preventSubmissionInput = document.getElementById("preventSubmission");
+
+        // Check the value of the hidden input before submitting the form
+        if (preventSubmissionInput.value === "true") {
+            // You can optionally perform additional actions here or remove the alert.
+        } else {
+            // Submit the form
+            document.forms["saveItemsForm"].submit();
+        }
+    }
+</script>
 
         {{--  When unchecked add ID's to hidden list to be deleted --}}
         <script>
@@ -876,5 +843,26 @@
                 });
             });
         </script>
+
+<script>
+    // function validateInput(input) {
+
+    //     var value = input.value;
+
+    //     // Check if the value is blank or below 1
+    //     if (value !== '' && parseInt(value) > 0) {
+    //         // Set the border color to red
+    //         input.style.boxShadow = '0 0 0 0.25rem #7cbf7a';
+
+
+    //     } else {
+
+    //         input.style.boxShadow = '0 0 0 0.25rem red';
+    //         document.getElementById("submitFormButton").disabled = true;
+    //       //  alert('Pidoooooo Black Baby Bitch');
+    //     }
+
+    // }
+</script>
 
     @endsection

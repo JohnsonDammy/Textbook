@@ -37,7 +37,7 @@
                     <div class="modal-body">
                         <div class="text-center">
                             <img src="{{ asset('img/popup-check.svg') }}" class="img-fluid mb-5" alt="">
-                            <h4 class="modal-title">Successfully sent emails</h4>
+                            <h4 class="modal-title">Successfully sent email</h4>
                             <p class="modal-title_des">Email sent to recommended supplier
                             </p>
                         </div>
@@ -104,7 +104,10 @@
                                 <th>Address</th>
                                 <th>Contact No</th>
                                 <th> Amount </th>
+
+                                @if (session('requestType') === "Textbook")
                                 <th> Mark Up (%) </th>
+                                @endif
                               
                             </tr>
                         </thead>
@@ -145,10 +148,9 @@
  
                                         <td>{{ $item->CompanyContact }} </td>
  
+
                                         <td>
- 
- 
-                                            @if ($item->markUp > 27)
+                                             @if ($item->markUp > 27)
                                                 <span style="color:red">R
                                                     {{ number_format($item->amount, 2, '.', ',') }}</span>
                                             @else
@@ -156,19 +158,15 @@
                                                     {{ number_format($item->amount, 2, '.', ',') }}</span>
                                             @endif
  
- 
- 
                                         </td>
- 
+                                        @if (session('requestType') === "Textbook")
+
                                         <td>
- 
- 
                                             {{ $item->markUp }}
  
                                         </td>
- 
- 
-                                       
+                                        @endif
+
  
                                     </tr>
                                 @endforeach
@@ -196,16 +194,15 @@
  
                     <div class="form-group col-12 col-md-6 col-xl-3">
                         <div class="input-group">
-
                                             <div style="display:none" id= "errorClosingDate" class="text-danger">Delivery Date 
                                             </div>
                                             <label for="exampleDate">Select delivery Date:</label>
                                             <input type="text" class="form-control datepicker" 
-                                                name="deliveryDate" id="DeliveryDate" placeholder="MM/DD/YYYY" required>
+                                                name="deliveryDate" id="DeliveryDate" placeholder="DD/MM/YYYY" required>
 
                                                 <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="fa fa-calendar" style="font-size:35px"></i>
+                                                    <span class="input-group-text" style="background-color: #F4F9F4;">
+                                                        <i class="fa fa-calendar" style="font-size:40px; background-color:#F4F9F4;"></i>
                                                     </span>
                                                 </div>
                         </div>
@@ -228,12 +225,12 @@
                         <div class="input-group">
 
                         <input type="text" class="form-control datepicker" 
-                            name="FailDate" id="closingDateInput" required placeholder="MM/DD/YYYY"  onclick="Select()"
+                            name="FailDate" id="closingDateInput" required placeholder="DD/MM/YYYY"  onclick="Select()"
                             >
 
                             <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <i class="fa fa-calendar" style="font-size:20px"></i>
+                                <span class="input-group-text" style="background-color: #F4F9F4;">
+                                    <i class="fa fa-calendar" style="font-size:40px; background-color:#F4F9F4;"></i>
                                 </span>
                             </div>
                         </div>
@@ -258,7 +255,7 @@
 
                         <i class="fas fa-download" style="color: green;"></i>
                             <a href="javascript:void(0);" id="downloadLink" style="color:green; text-decoration: underline; font-style: italic;" onclick="reloadPageAndNavigate('{{ route('OrderLetter') }}')" disabled>
-                                Download Order Form
+                                Download Order Form+
                             </a>
 
                     </div>
@@ -269,7 +266,7 @@
                     <label for="reference-number">Upload Signed Order Form</label>
                     <div class="input-group">
                         <input type="file" name="fileOrder" id="fileComiteeInput" required
-                            value="" disabled onclick="enableUploadInput()">
+                            value="" disabled onchange="enableUploadInput()">
                         <div style="display:none" id= "errorComitee" class="text-danger">Please
                             select file
                         </div>
@@ -341,6 +338,7 @@ function Select(){
                     document.getElementById('downloadLink').style.pointerEvents = 'none';
 
                     $('.datepicker').datepicker({
+                        format: "dd/mm/yyyy",
                         startDate: new Date() // Set the start date to today
                     });
                 });
@@ -363,9 +361,20 @@ function Select(){
 
 <script>
     function enableUploadInput() {
-  document.getElementById('btnSub').disabled = false;
+  //document.getElementById('btnSub').disabled = false;
 
+  var fileInput = document.getElementById('fileComiteeInput');
+        var submitButton = document.getElementById('btnSub');
+        var errorComitee = document.getElementById('errorComitee');
 
+        if (fileInput.files.length > 0) {
+            submitButton.disabled = false;
+          //  alert('Has file')
+        } else {
+            submitButton.disabled = true;
+           // alert('NO FIle')
+
+        }
       
 
     }

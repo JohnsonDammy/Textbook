@@ -113,6 +113,7 @@ class RequestPrecurementController extends Controller
                         'Message' => $messages,
                         'Date'=> $today,
                         'year'=> $today,
+                        'DelVal' => "1"
 
                     ]);
 
@@ -176,7 +177,7 @@ class RequestPrecurementController extends Controller
                         'Message' => $messages,
                         'Request' => $Request,
                         'seen' => "0",
-                        'DelVal' => "0",
+                        'DelVal' => "1",
                         //   'Date' => now(), // You can set the date to the current timestamp
                         //'year' => $Year,
                     ];

@@ -66,7 +66,6 @@
 
                             @if (Auth::user()->getOrganization->id == 2)
 
-
                                 {{-- <div class="col-12 mb-3">
                                     <h3>Please carefully choose from the procurement outlined in <b>Section 21 C</b> for either textbook, stationery, or both, as per your specific requirements</h3><br>
                                     <div class="row justify-content-center g-4">
@@ -91,10 +90,6 @@
 
 
                             @endif
-
-
-
-
                         </div>
 
                     </div>

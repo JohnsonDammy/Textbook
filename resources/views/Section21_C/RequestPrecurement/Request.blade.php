@@ -61,9 +61,8 @@
                                 @if (Auth::user()->getOrganization->id == 2)
                                     <div class="col-12 mb-3">
                                        <br>
-                                        <h4>Please carefully choose from the <b><?php print date('Y')  ?></b> procurement outlined in <b>Section
-                                                21 C</b> for either textbook, stationery, or both, as per your specific
-                                            requirements</h4><br><br><br><br>
+                                        <h4>Please carefully choose from your procurement method in terms of Section 21C 
+                                            </h4><br><br><br><br>
                                             <div class="row justify-content-center g-2">
                                                 <div class="col-12 col-lg-4">
                                                     <div class="form-control">
@@ -177,7 +176,24 @@
         </div>
         </div>
 
+        <div class="modal fade" id="ModelLoading" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered popup-alert">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="spinner-container" id="spinner">
+                        <div class="spinner-border text-primary" role="status">
+                        </div>
+                        <label> Please wait... </label>
+                    </div>
 
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
         </div>
 
         @if ($message = Session::get('status'))
@@ -209,6 +225,19 @@
                 $('#selectedOption').val($(this).val());
             });
         </script>
+
+
+
+<script>
+    $(document).ready(function() {
+        $("#yesBtnModel").click(function(){
+        $('#ModelLoading').modal('show');
+
+        })
+
+    
+    });
+</script>
 
        {{-- Ensure that user can only  --}}
        <script>

@@ -64,14 +64,15 @@ $remainderRows = $dataSavedStationery->count() % 15;
         width:1100px;
     }
     .txt{
-        font-size:11.0pt;
+        font-size:13pt;
         font-family:"Calibri",sans-serif;
     }
     
 
     .Test{
         /* font-family:"Calibri",sans-serif; */
- 
+        font-size:12pt;
+        font-family:"Calibri",sans-serif;
     }
 
     .txtx{
@@ -85,10 +86,12 @@ $remainderRows = $dataSavedStationery->count() % 15;
     }
     
     .anotherK{
-            border-collapse: collapse;
-            margin-top: -175px;
-            margin-left: 1110px;
-    }
+
+margin-top: -175px;
+margin-left: 1110px;
+height: 170px;
+width: 400px;
+}
     .anotherB{
             border-collapse: collapse;
     }
@@ -132,14 +135,14 @@ $remainderRows = $dataSavedStationery->count() % 15;
         </table>
           <div style="page-break-before: always;"></div>
     <p>
-        <img src="{{ asset('img/iconss.jpg') }}" width="141px" height="78px">
+        <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('img/iconss.jpg'))) }}" width="141px" height="78px">
     </p>
     <label><center><b><span style='font-size:13.5pt;line-height:107%;font-family:"Arial",sans-serif'>
       
         KWAZULU NATAL DEPARTMENT OF EDUCATION </span></center></b></label>
     
     <p class=MsoNormal><center>STANDARDISED REQUEST FOR QUOTATION
-    FORM 2023/2024 </center></p>
+    FORM {{date('Y')}} </center></p>
     
     <table border="1" class="anotherB">
         <tr>
@@ -154,14 +157,14 @@ $remainderRows = $dataSavedStationery->count() % 15;
         <td><label class="txt">DELIVERY ADDRESS:</label></td>  <td colspan="8">&nbsp;</td><td width="180px" rowspan="5">[SCHOOL STAMP]</td>
         </tr>
         <tr>
-            <td colspan="9"><p class=MsoNormal><b><span style='font-size:9.0pt;line-height:106%'>Please furnish
+            <td colspan="9"><p class=MsoNormal><b><span style='font-size:13pt;line-height:106%'>Please furnish
                 a quotation in respect of the items listed below. Quotations must be valid
                 until 30 November 2023. Quotations must be accompanied by a completed SDB4
                 Form and a Certified Copy of a Valid Tax Clearance Certificate. Illegible
                 writing and use of correction fluid shall invalidate your quotation.</span></b></p></td>
         </tr>
         <tr>
-            <td colspan="9"><p class=MsoNormal><b><span style='font-size:9.0pt;line-height:106%'>For
+            <td colspan="9"><p class=MsoNormal><b><span style='font-size:13pt;line-height:106%'>For
                 Textbook Quotations, the total cost has been determined using the
                 Department's catalogue (Sections B1 &amp; B2). Companies must please complete
                 Section C(2) by indicating the percentage and value of your service which
@@ -169,7 +172,7 @@ $remainderRows = $dataSavedStationery->count() % 15;
                 and sign at Section C(1).</span></b></p></td>
         </tr>
         <tr>
-            <td colspan="9"> <p class=MsoNormal><b><span style='font-size:9.0pt;line-height:106%'>For
+            <td colspan="9"> <p class=MsoNormal><b><span style='font-size:13pt;line-height:106%'>For
                 Stationery Quotations, companies must complete Section B2 and stamp and sign
                 at Section C(1).</span></b></p></td>
         </tr>
@@ -183,7 +186,7 @@ $remainderRows = $dataSavedStationery->count() % 15;
     <tr>
         <th colspan="4"><label class="txt">SECTION B(1) </label></th>
     </tr>
-    <tr><th> <label class="txt">ISB NO./ITEM NO.</label></th> <th><label class="txt">TEXTBOOK/STATIONERY ITEM DESCRIPTION</label></th><th><label class="txt">UNIT</label></th><th><label class="txt">QTY</label></th></tr>
+    <tr><th> <label class="txt">ISB NO./ITEM NO.</label></th> <th><label class="txt">TEXTBOOK/STATIONERY ITEM DESCRIPTION</label></th><th><label class="txt">QTY</label></th></tr>
     
     
     @foreach ($chunk as $item)
@@ -194,7 +197,7 @@ $remainderRows = $dataSavedStationery->count() % 15;
   
 
     
-  <tr><td><label class="Test"> &nbsp;{{  $item->item_code }}</label></td><td><label class="Test">&nbsp; {{  $item->item_title }}</label></td><td><label class="Test">&nbsp; R {{ number_format($price, 2, '.', ',') }}</label></td><td><label class="Test">&nbsp;{{  $item->Quantity }}</label></td></tr>
+  <tr><td><label class="Test"> &nbsp;{{  $item->item_code }}</label></td><td><label class="Test">&nbsp; {{  $item->item_title }}</label></td><td><label class="Test">&nbsp;{{  $item->Quantity }}</label></td></tr>
     @endforeach
 
     @if($totalLoops == $totalChunks && $remainderRows != 0)
@@ -203,7 +206,7 @@ $remainderRows = $dataSavedStationery->count() % 15;
     @endphp
 
      @for ($i = 1; $i <= $additionalRows; $i++) 
-     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp; </td><td>&nbsp;</td></tr> 
+     <tr><td>&nbsp;</td><td>&nbsp;</td><td colspan="2">&nbsp;</td></tr> 
      @endfor
    @endif
     </table>
@@ -320,10 +323,10 @@ $remainderRows = $dataSavedStationery->count() % 15;
             <th colspan="3" width="300"><label class="txt">SECTION C(2)</label></th>
         </tr>
         <tr>
-            <td width="120px"> <label class="txt"> SERVICE CHARGE</label></td><td width="50px">1</td><td width="50px">2</td>
+            <td width="200px"> <label class="txt"> SERVICE CHARGE</label></td><td width="80px"></td><td width="60px"></td>
         </tr>
         <tr>
-            <td  width="120px"><label class="txt"> QUOTATION FOR STATIONERY </td></label><td>1</td width="50px"><td width="50px">2</td>
+            <td  width="200px"><label class="txt"> QUOTATION FOR TEXTBOOKS </td></label><td></td width="80px"><td width="60px"></td>
         </tr>
     </table>
     </div>

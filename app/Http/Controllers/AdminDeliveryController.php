@@ -40,6 +40,7 @@ class AdminDeliveryController extends Controller
         $district_id = User::where('username', $user)->value('District_id');
         $quotesData = doc_quote::all();
         $deliveryData = deliveryCapture::all();
+        $AllOrderAmount = savedstationeryitems::all();
         
 
         $isActive = "1";
@@ -47,11 +48,11 @@ class AdminDeliveryController extends Controller
 
 
         $data = DB::table('deliveryselection')
-            ->join('schools', 'deliveryselection.Emis', '=', 'schools.emis')
-            ->select('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number')
-            ->groupBy('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number')
-            ->paginate(10);
-
+        ->join('schools', 'deliveryselection.Emis', '=', 'schools.emis')
+        ->select('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number')
+        ->groupBy('schools.name', 'schools.emis', 'deliveryselection.RequestType', 'deliveryselection.References_Number')
+        ->paginate(10);
+    
         
 
         $querySavedItems = AdminSavedTextbookCapturedValueModel::where('Emis', session('Newemis'))->get();
@@ -60,8 +61,12 @@ class AdminDeliveryController extends Controller
         
         //$OrderAmount = doc_quote::where('Emis', session('Newemis'))->value('ordered_amt');
 
+        // $OrdAmountSum = savedstationeryit+ems::where('school_emis', session('Newemis'))
+        // ->sum('TotalPrice');
 
-        return view('furniture.AdminDelivery.list', compact('data', 'quotesData', 'deliveryData'));
+
+
+        return view('furniture.AdminDelivery.list', compact('data', 'quotesData', 'deliveryData', 'AllOrderAmount'));
     }
 
     public function CaptureData(Request $request, $delID, $requestType, $idInbox, $new_emis)
@@ -76,6 +81,7 @@ class AdminDeliveryController extends Controller
         session(['RequestTypes' => $requestType]);
 
        
+        session(['delID' => $delID]);
         //Insert into the delivery_capture table
         if($existDeliveredItem)
         {
@@ -216,7 +222,10 @@ class AdminDeliveryController extends Controller
                 ->with('textbookDataFromDatabase', $textbookDataFromDatabase);
         } else if ($requestType === "Stationery") {
 
+         //   dump("Here");
             // $emis = $request->input("emis");
+
+            
 
             $searchWord = "";
 
@@ -228,10 +237,16 @@ class AdminDeliveryController extends Controller
 
             $emis = session('Newemis');
 
-            // $StationeryDataFromDatabase = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
-            // session(['StationeryDataFromDatabase' => $StationeryDataFromDatabase]);
+             $StationeryDataFromDatabase = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->where('refNoSeq', $refSeqNo)->get();
+             $allStationaryItemsSaved = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
 
-            //   session(['requestType' => $requestType]);
+             session(['StationeryDataFromDatabase' => $StationeryDataFromDatabase]);
+             session(['allStationaryItemsSaved' => $allStationaryItemsSaved]);
+
+
+
+
+            session(['requestType' => $requestType]);
             session(['idInbox' => $idInbox]);
 
             //    $stationeryData= stationeryCatModel::paginate(40);
@@ -242,9 +257,11 @@ class AdminDeliveryController extends Controller
             $stationeryCat = $querySavedItems;
             session(['stationeryCat' => $stationeryCat]);
 
-            $querySavedItems = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
+            $querySavedItems = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->where('refNoSeq' , $refSeqNo)->get();
             $dataSavedStationery = $querySavedItems;
             session(['dataSavedStationery' => $dataSavedStationery]);
+
+
 
             $searchWord = "";
 
@@ -257,19 +274,66 @@ class AdminDeliveryController extends Controller
 
             session(['dataNewStat' => $dataNewStat]);
 
+            $data = inbox_school::all();
+
+            $emis = $request->input("emis");
+            session(['emis' => $emis]);
+            $schoolLevel = School::where('emis', $emis)->value('level_id');
+
             $quoteStatus = inbox_school::where('Id', $idInbox)->value('status');
             session(['quoteStatus' => $quoteStatus]);
+
+
+            $querySavedItems = savedStationeryitems::where('school_emis', $emis)->get();
+            $dataSavedStationary = $querySavedItems;
+            session(['dataSavedStationary' => $dataSavedStationary]);
+            session(['status' => 'In Progress']);
+
+            // INSERT INTO `savedstationeryitems`(`Id`, `item_code`, `item_title`, `price`, `Quantity`, `TotalPrice`, `inbox_id`, `stationery_id`, `school_emis`, `Grade`) 
+            // VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]')
+
+            // INSERT INTO `stationarycat`(`id`, `ItemCode`, `Item`, `Quantity`, `UnitPrices`, `updated_at`, `created_at`) 
+            // VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]')
+
+            $dataQuery  = DB::table('savedstationeryitems')
+            ->join('stationarycat', 'savedstationeryitems.item_code', '=', 'stationarycat.ItemCode')
+            ->select('stationarycat.ItemCode', 'stationarycat.Item', 'stationarycat.Quantity', 'stationarycat.UnitPrices', 'savedstationeryitems.TotalPrice')
+            ->where('savedstationeryitems.school_emis', session('Newemis'))
+            ->paginate(10);
+
+
+            
+            $StationaryData = $dataQuery;
+            session(['StationaryData' => $StationaryData]);
+
+          //  session(['schoolLevel' => $schoolLevel]);
+         //   $Subjects = StationeryCatModel::distinct()->pluck('Subject');
+           // $Publishers = StationeryCatModel::distinct()->pluck('Publisher');
+            //$status = "In Progress";
+
+            $OrderAmount = doc_quote::where('Emis', session('Newemis'))->value('ordered_amt');
+
+
+            $dataNew = DB::table('deliveryselection')
+            ->where('Emis', $emis)
+            ->where('RequestType', "Stationery")
+
+            // Replace 'your_emis_value' with the actual value
+            ->paginate(10);
+
+            session(['dataNew' => $dataNew]);
+
 
             $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Stationery')->value('allocation');
             session(['AllocatedAmt' => $AllocatedAmt]);
 
             return view('furniture.AdminDelivery.StatCapture')
-                ->with('requestType', $requestType)
-                ->with('emis', $emis)
-                ->with('idInbox', $idInbox)
-                ->with('searchWord', $searchWord)
-                ->with('dataSavedStationery', $dataSavedStationery)
-                ->with('stationeryCat', $stationeryCat)
+               ->with('requestType', $requestType)
+              ->with('emis', $emis)
+               ->with('idInbox', $idInbox)
+               ->with('searchWord', $searchWord)
+              ->with('dataSavedStationery', $dataSavedStationery)
+                 ->with('stationeryCat', $stationeryCat)
 
 
                 ->with('dataNewStat', $dataNewStat);
@@ -397,8 +461,10 @@ class AdminDeliveryController extends Controller
                 ->with('dataSavedTextbook', $dataSavedTextbook)
                 ->with('textbooksData', $textbooksData)
                 ->with('textbookDataFromDatabase', $textbookDataFromDatabase);
+
         } else if ($requestType === "Stationery") {
 
+         //   dump("HJHhhh");
             // $emis = $request->input("emis");
 
             $searchWord = "";
@@ -411,10 +477,10 @@ class AdminDeliveryController extends Controller
 
             $emis = session('Newemis');
 
-            // $StationeryDataFromDatabase = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
-            // session(['StationeryDataFromDatabase' => $StationeryDataFromDatabase]);
+             $StationeryDataFromDatabase = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
+            session(['StationeryDataFromDatabase' => $StationeryDataFromDatabase]);
 
-            //   session(['requestType' => $requestType]);
+            session(['requestType' => $requestType]);
             session(['idInbox' => $idInbox]);
 
             //    $stationeryData= stationeryCatModel::paginate(40);
@@ -434,11 +500,14 @@ class AdminDeliveryController extends Controller
             $dataNewStat = DB::table('deliveryselection')
                 ->where('Emis', session('Newemis'))
                 ->where('RequestType', "Stationery")
+                ->where('IsActive' , "1")
 
                 // Replace 'your_emis_value' with the actual value
                 ->paginate(10);
 
             session(['dataNewStat' => $dataNewStat]);
+
+
 
             $quoteStatus = inbox_school::where('Id', $idInbox)->value('status');
             session(['quoteStatus' => $quoteStatus]);
@@ -446,16 +515,16 @@ class AdminDeliveryController extends Controller
             $AllocatedAmt = inbox_school::where('school_emis', $emis)->where('requestType', 'Stationery')->value('allocation');
             session(['AllocatedAmt' => $AllocatedAmt]);
 
-            return view('furniture.AdminDelivery.StatCapture')
+             return view('furniture.AdminDelivery.CaptureNew')
                 ->with('requestType', $requestType)
-                ->with('emis', $emis)
-                ->with('idInbox', $idInbox)
-                ->with('searchWord', $searchWord)
-                ->with('dataSavedStationery', $dataSavedStationery)
-                ->with('stationeryCat', $stationeryCat)
+               ->with('emis', $emis)
+              ->with('idInbox', $idInbox)
+              ->with('searchWord', $searchWord)
+             ->with('dataSavedStationery', $dataSavedStationery)
+               ->with('stationeryCat', $stationeryCat)
 
 
-                ->with('dataNewStat', $dataNewStat);
+          ->with('dataNewStat', $dataNewStat);
         }
     }
 
@@ -662,30 +731,21 @@ class AdminDeliveryController extends Controller
     {
         $emis = session('Newemis');
         $RequestType = session('NewrequestType');
-
         $newItems = $request->input('selectedItems');
-
         $Final = $request->input('inlineRadioOptions');
 
         //if not empty
         $ReferenceNo = session("RefNoSeq");
-
         $TPCapQuantity = $request->input('TPCapQuantity');
-
         $ExistingCapturedQuantity = deliveryCapture::where('RefNoSeq', $ReferenceNo)->value('TotalCaptureQuantityAmount');
 
+        //SELECT SUM(Captured_Quantity) FROM `adminsavedtextbookcapturedvalue`;
 
+    
+        // if($Final != null){
 
-
-        if($Final != null){
-
-            DB::table('deliverycapture')
-            ->where('RefNoSeq' , $ReferenceNo)
-            ->update([
-                'isFinal' => "Yes",
-
-            ]);
-        }
+          
+        // }
         $totalT=0;
 
         //Delete items that are unchecked
@@ -697,7 +757,6 @@ class AdminDeliveryController extends Controller
         if ($newItems != null) {
             $selectedQuantities = $request->input('selectedQuantities');
             $EnteredQuantities = $request->input('CapturedQuantity');
-
 
 
             try {
@@ -783,7 +842,7 @@ class AdminDeliveryController extends Controller
                 ->update([
                     'TotalCaptureQuantityAmount' => $totalT + $ExistingCapturedQuantity,
                 ]);
-
+ 
                 
             } catch (\Exception $e) {
                 // Handle exceptions if needed
@@ -819,8 +878,6 @@ class AdminDeliveryController extends Controller
             session(['textbookDataFromDatabase' => $textbookDataFromDatabase]);
 
 
-
-
             return redirect($nextPageUrl);
         } elseif ($isPreviousClicked) {
 
@@ -853,13 +910,44 @@ class AdminDeliveryController extends Controller
         $textbookDataFromDatabase = $querySavedItems;
         session(['textbookDataFromDatabase' => $textbookDataFromDatabase]);
 
-        return redirect()->back()->with('success', 'Data Successfully Captured/Updated.');
+
+        $TotalCapturedQuantity = AdminSavedTextbookCapturedValueModel::where('Emis', session('Newemis'))
+        ->sum('Captured_Quantity');
+
+        $DeliveredQuantity = AdminSavedTextbookCapturedValueModel::where('Emis', session('Newemis'))
+        ->sum('Quantity');
+
+
+       // dump("Total Captured Quantity is :"  . $TotalCapturedQuantity);
+      //  dump("Total Quantity is :"  . $DeliveredQuantity);
+
+        // SELECT * FROM `deliveryselection` where RequestType ="Textbook" and Emis ="500117956";
+
+        $CheckAllComplete = deliveryselection::where('RequestType', $RequestType )->where('Emis', session('Newemis') );
+
+         $totalQuantity = session('totalQuantityNew');
+
+        // dump("Total Quantity is :"  . $totalQuantity);
+        //dump("Total Captured Quantity is :"  . $TotalCapturedQuantity);
+        //dump('ReferenceNo' , $ReferenceNo );
+
+        if ((int)$TotalCapturedQuantity === (int)$totalQuantity) {
+           // dump("Here code");
+         DB::table('deliverycapture')
+             ->where('RefNoSeq' , $ReferenceNo)
+            ->update([
+            'isFinal' => "Yes",
+              ]);
+       }
+
+
+
+         return redirect()->back()->with('success', 'Data Successfully Captured/Updated.');
     }
 
 
     public function deleteTextbookItem($id)
     {
-
         // Delete the record with the specified ISBN
         $emis = session('Newemis');
 
@@ -878,11 +966,7 @@ class AdminDeliveryController extends Controller
                 'success' => 'Item Deleted Successfullysss!',
                 'activeTab' => 'tab3',
                 'textbookDataFromDatabase' =>  $textbookDataFromDatabase,
-
-
-
             ]);
-
 
             $querySavedItems = AdminSavedTextbookCapturedValueModel::where('Emis', $emis)->get();
             $textbookDataFromDatabase = $querySavedItems;
@@ -892,11 +976,8 @@ class AdminDeliveryController extends Controller
                 'success' => 'Item Deleted SuccessfullyGG!',
                 'activeTab' => 'tab3',
                 'textbookDataFromDatabase' =>  $textbookDataFromDatabase,
-
                 // Set the active tab here
             ]);
-
-
 
             $querySavedItems = AdminSavedTextbookCapturedValueModel::where('Emis', $emis)->get();
             $textbookDataFromDatabase = $querySavedItems;
@@ -972,26 +1053,50 @@ class AdminDeliveryController extends Controller
         $emis = session('Newemis');
         // Retrieve the new array from the request
 
+        $Final = $request->input('inlineRadioOptions');
 
-        //Delete items that are unchecked
-        $uncheckedItems = explode(',', $request->input('UncheckedItems'));
-        foreach ($uncheckedItems as $itemId) {
-            AdminSavedStationeryCapturedValueModel::where('stationery_id', $itemId)->delete();
-        }
+        $ReferenceNo = session("RefNoSeq");
+
+       // dump($ReferenceNo);  //Ref_500131794_20240119_111_74
+
+  
+       
 
 
-        if (session('quoteStatus') != "Quote Created") {
-            $newItems = $request->input('selectedItems');
+        // if($Final != null){
+
+        //     DB::table('deliverycapture')
+        //     ->where('RefNoSeq' , $ReferenceNo)
+        //     ->update([
+        //         'isFinal' => "Yes",
+
+        //     ]);
+        // }
+
+        $totalT=0;
+
+        $ExistingCapturedQuantity = deliveryCapture::where('RefNoSeq', $ReferenceNo)->value('TotalCaptureQuantityAmount'); //200
+
+        // //Delete items that are unchecked
+        // $uncheckedItems = explode(',', $request->input('UncheckedItems'));
+        // foreach ($uncheckedItems as $itemId) {
+        //     AdminSavedStationeryCapturedValueModel::where('stationery_id', $itemId)->delete();
+        // }
+
+
+      //  if (session('quoteStatus') != "Quote Created") {
+
+            $newItems = $request->input('selectedItems'); // checkbox
 
             $querySavedItems = savedstationeryitems::where('school_emis', $emis)->paginate(10);
             $stationeryCat = $querySavedItems;
             session(['stationeryCat' => $stationeryCat]);
 
             //Delete items that are unchecked
-            $uncheckedItems = explode(',', $request->input('UncheckedItems'));
-            foreach ($uncheckedItems as $itemId) {
-                AdminSavedStationeryCapturedValueModel::where('stationery_id', $itemId)->delete();
-            }
+            // $uncheckedItems = explode(',', $request->input('UncheckedItems'));
+            // foreach ($uncheckedItems as $itemId) {
+            //     AdminSavedStationeryCapturedValueModel::where('stationery_id', $itemId)->delete();
+            // }
 
 
             //Check if there is any null items from the newly selected items
@@ -1002,7 +1107,7 @@ class AdminDeliveryController extends Controller
 
                 // Validation logic
 
-                $selectedQuantities = $request->input('selectedQuantities');
+                $selectedQuantities = $request->input('selectedQuantities'); // Existing Quantity
 
                 $CapturedQuantity = $request->input('CaptureQuantity');
 
@@ -1012,7 +1117,7 @@ class AdminDeliveryController extends Controller
                 //INSERT INTO `savedstationeryitems`(`id`, `item_code`, `item_title`, `price`, `Quantity`, `TotalPrice`, `inbox_id`, `stationery_id`, `school_emis`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]')
                 $selectedRecords = savedstationeryitems::whereIn('id', $newItems)->get(['id', 'item_code', 'item_title', 'price']);
 
-                // dump($selectedRecords);
+                 //dump($selectedRecords);
 
                 $querySavedItems = AdminSavedStationeryCapturedValueModel::where('Emis', $emis)->get();
                 $dataSavedStationery = $querySavedItems;
@@ -1023,17 +1128,35 @@ class AdminDeliveryController extends Controller
 
                     foreach ($selectedRecords as $record) {
 
-                        // dump($record);
+                    // dump($record);
+                    $deliveryID = session('DeliveredID');
 
                         //INSERT INTO `adminsavedstationerycapturedvalue`(`id`, `ItemCode`, `Emis`, `Item`, `Quantity`, `UnitPrices`, `Captured_Quantity`, `updated_at`, `created_at`, `stationery_id`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]')
-                        $SavedItem = AdminSavedStationeryCapturedValueModel::where('ItemCode', $record->item_code)->first();
+                        $SavedItem = AdminSavedStationeryCapturedValueModel::where('ItemCode', $record->item_code)->where('refNoSeq', session("RefNoSeq"))->first();
                         $itemId = $record->id;
-                        $price = (float) str_replace(['R', ',', ' '], '', 100.00);
+                        $price = ($record->price);
                         $quantity = $selectedQuantities[$itemId];
                         $Capturedquantity = $CapturedQuantity[$itemId];
+                        // dump($price);
+                        // dump($quantity);
+                        // dump($Capturedquantity);
+
+                        // dump($deliveryID);
 
                         //Check if the item exist, if it does then do an update 
                         //INSERT INTO `adminsavedstationerycapturedvalue`(`id`, `ItemCode`, `Emis`, `Item`, `Quantity`, `UnitPrices`, `Captured_Quantity`, `updated_at`, `created_at`, `stationery_id`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]')
+
+                        $emis = session('Newemis');
+                        // $existingItem = AdminSavedStationeryCapturedValueModel::where('refNoSeq', session("RefNoSeq"))->where('stationery_id', $itemId)
+                        //     ->where('Emis', $emis)
+                        //     ->first();
+
+                            $totalT =  $totalT + ($Capturedquantity * $price);
+                            //dump($totalT);
+
+                            $TotalAll = $ExistingCapturedQuantity + $totalT ;
+                          
+
                         if ($SavedItem) {
 
                             DB::table('adminsavedstationerycapturedvalue')
@@ -1041,6 +1164,13 @@ class AdminDeliveryController extends Controller
                                 ->update([
                                     'Captured_Quantity' => $quantity,
 
+                                ]);
+
+                                DB::table('deliveryselection')
+                                ->where('Id' , $deliveryID)
+                                ->update([
+                                    'IsActive' => '0',
+                        
                                 ]);
                         } // else the item will be inserted as new record
                         else {
@@ -1060,10 +1190,31 @@ class AdminDeliveryController extends Controller
                                     'Captured_Quantity' => $Capturedquantity,
                                     'stationery_id' => $record->id,
                                     'Emis' => $emis,
+                                    'refNoSeq' => session("RefNoSeq"),
+                                ]);
+
+
+                                DB::table('deliveryselection')
+                                ->where('Id' , $deliveryID)
+                                ->update([
+                                    'IsActive' => '0',
+                        
                                 ]);
                         }
                     }
-                } catch (\Exception $e) {
+
+
+                    DB::table('deliverycapture')
+                    ->where('RefNoSeq', $ReferenceNo)
+                    ->update([
+                        'TotalCaptureQuantityAmount' => $totalT + $ExistingCapturedQuantity,
+                    ]);
+
+                }
+                
+                
+                
+                catch (\Exception $e) {
                 }
             }
 
@@ -1079,17 +1230,22 @@ class AdminDeliveryController extends Controller
             $isPreviousClicked = $request->input('previousPage') === 'true';
 
             // Now, you can perform logic based on these flags
+            //Missing required parameter for [Route: CaptureData] [URI: CaptureData/{delID}/{requestType}/{idInbox}/{emis_new}] [Missing parameter: delID].
+
+            //       Route::get('/CaptureData/{delID}/{requestType}/{idInbox}/{emis_new}', [\App\Http\Controllers\AdminDeliveryController::class, 'CaptureData'])->name('CaptureData');
+
             if ($isNextClicked) {
 
                 $currentPage = session('stationeryCat')->currentPage(); // Get the current page number
                 $nextPage = $currentPage + 1;
 
                 $nextPageUrl = route('CaptureData', [
-                    'page' =>   $nextPage, // Assuming $textbooksData is a paginator
-                    //  'searchWord' => session('searchWord'),
+                    'delID' => session('delID'),
                     'requestType' => "Stationery",
                     'idInbox' => "1",
-                    'emis_new' => session('Newemis')
+                    'emis_new' => session('Newemis'),
+                    'page' =>   $nextPage, // Assuming $textbooksData is a paginator
+
                 ]);
                 session()->forget('selectedItems');
 
@@ -1109,11 +1265,12 @@ class AdminDeliveryController extends Controller
                 $previousPage = $currentPage - 1;
 
                 $previousPageUrl = route('CaptureData', [
-                    'page' =>   $previousPage, // Assuming $textbooksData is a paginator
-                    //  'searchWord' => session('searchWord'),
+                    'delID' => session('delID'),
                     'requestType' => "Stationery",
                     'idInbox' => "1",
-                    'emis_new' => session('Newemis')
+                    'emis_new' => session('Newemis'),
+                    'page' =>   $previousPage,
+
 
                 ]);
 
@@ -1129,8 +1286,24 @@ class AdminDeliveryController extends Controller
                 return redirect($previousPageUrl);
             }
 
-            return redirect()->back();
+
+            $TotalCapturedQuantityStat = AdminSavedStationeryCapturedValueModel::where('Emis', session('Newemis'))
+            ->sum('Quantity');
+     
+     
+            $totalQuantityStat = session('totalQuantityStat');
+     
+             
+            if ((int)$TotalCapturedQuantityStat === (int)$totalQuantityStat) {
+            // dump("Here code");
+          DB::table('deliverycapture')
+              ->where('RefNoSeq' , $ReferenceNo)
+             ->update([
+             'isFinal' => "Yes",
+               ]);
         }
+            return redirect()->back();
+      //  }
     }
 
 
@@ -1247,6 +1420,8 @@ class AdminDeliveryController extends Controller
     {
         $quotesData = doc_quote::all();
         $deliveryData = deliveryCapture::all();
+        $AllOrderAmount = savedstationeryitems::all();
+
 
 
         $messages ="";
@@ -1294,10 +1469,55 @@ class AdminDeliveryController extends Controller
 
     
         // Return the view with the filtered data
-        return view('furniture.AdminDelivery.list', compact('data', 'messages', 'quotesData', 'deliveryData'));
+        return view('furniture.AdminDelivery.list', compact('data', 'messages', 'quotesData', 'deliveryData', 'AllOrderAmount'));
 
         //return view('furniture.AdminDelivery.list', compact('data', 'quotesData', 'deliveryData'));
 
+    }
+
+
+
+
+
+    public function searchRequestView(Request $request)
+    {
+        $SchoolData = School::all();
+    
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
+    
+        $messages = "";
+        
+        // Start with the query builder
+        $datass = inbox_school::where('district_id', $district_id)
+            ->where("status", "Quote Received");
+    
+        // Apply search conditions based on the form input
+        if ($request->filled('ref_number')) {
+            $datass->where('referenceNo', 'LIKE', '%' . $request->input('ref_number') . '%');
+        }
+    
+        if ($request->filled('school_name')) {
+            $SchoolData->where('name', 'LIKE', '%' . $request->input('school_name') . '%');
+        }
+    
+        if ($request->filled('RequestType')) {
+            $datass->where('requestType', $request->input('RequestType'));
+        }
+    
+        if ($request->filled('emis')) {
+            $datass->where('school_emis', 'LIKE', '%' . $request->input('emis') . '%');
+        }
+    
+        // Now, paginate the results
+        $data = $datass->paginate(10);
+    
+        // Check if any records were found
+        if ($data->isEmpty()) {
+            $messages = 'No records found.';
+        }
+    
+        return view('Section21_C.inbox_district.inboxDistrict', compact('data', 'SchoolData'));
     }
     
 }

@@ -173,7 +173,7 @@ System Support
                 'Message' => $messages,
                 'Request' => $Request,
                 'seen' => "0",
-                'DelVal' => "0",
+                'DelVal' => "1",
  
                 //   'Date' => now(), // You can set the date to the current timestamp
                 //'year' => $Year,

@@ -46,16 +46,16 @@
       <br />
       @foreach ($CapturedData as $item)
 
-      <u>[{{$item->email}}]</u>________________<br /><br>
-      <u>[{{$item->CompanyAddress}}]</u>__________<br /><br>
-      <u>[{{$item->CompanyContact}}]</u>______<br /><br>
+      <u>{{$item->email}}</u>________________<br /><br>
+      <u>{{$item->CompanyAddress}}</u>__________<br /><br>
+      <u>{{$item->CompanyContact}}</u>______<br /><br>
 <br>
       <br>
       <p>ORDER FOR THE PURCHASE FOR {{session('requestType')}}</p><br>
 
       <ol>
         <li> I, <u>{{$school_principal}}, </u>Principal of <u>{{session('schoolname')}}________________________<br></u>School Confirm that the School has  been granted Section 21(1)(c) function and has been mandated by the Department to place orders <br> for stationery / textbooks.</li><br><br>
-        <li> Your quotation numbered <u>[quote number]</u> and dated <u>[date recieved]</u>for the supply and delivery of stationery / textbooks has been found to be favourable</li><br><br>
+        <li> The date <u>{{$QuoteDate}} ,  </u>for the supply and delivery of stationery / textbooks has been found to be favourable</li><br><br>
         <li>Your quotation has been approved in full / approved duly reduced in terms of available funds in the amount of  <u>R      R {{ number_format($item->amount, 2, '.', ',') }}</u></li><br><br>
         <li>This serve as an order for supply and delivery to be finalized by___<u>{{$DeliveryDate}}</u>.Failure to supply by {{$FailDate}} <br> (the specified date) shall render this order null and void and your failure to deliver shall be reported to the Department of Education</li><br><br>
         <li>Upon delivery, the school undertakes to make payment in the amount of goods delivered. Funds have been earmarked and shall be recieved from the Department of Education in due course for the payment of LTSM items as per this order.</li><br><br>

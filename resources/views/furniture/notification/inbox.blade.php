@@ -110,7 +110,7 @@
                 @endif
                 <div class="col-12 col-md-12 my-3">
                     <p class="filter-title">Inbox Search</p>
-                    <form method="get" action="/RequestFunds-searchs">
+                    <form method="get" action="{{route('inbox-search')}}">
                         <div class="row justify-content-center align-items-center g-4">
 
                             <div class="col-12 col-md-6 col-xl-3">
@@ -122,17 +122,8 @@
                                 <input type="text" class="form-control search-input rounded-0" name="school_name"
                                     placeholder="School Name">
                             </div>
+                         
                             {{-- <div class="col-12 col-md-6 col-xl-3">
-                                <select class="form-select form-control rounded-0" name="status"
-                                    aria-label="Default select example">
-                                    <option selected>Status</option>
-                              <option value="Pending">Pending</option>
-                              <option value="Approved">Approved</option>
-                              <option value="Reject">Reject</option>
-
-                                </select>
-                            </div> --}}
-                            <div class="col-12 col-md-6 col-xl-3">
                                 <input type="text" class="form-control date-input rounded-0 dates" name="start_date"
                                     placeholder="Date" autocomplete="off">
                                 @if ($errors->has('start_date'))
@@ -150,11 +141,7 @@
 
                                 </select>
                             </div>
-                            {{-- <div class="col-12 col-md-6 col-xl-3">
-                                <input type="text" class="form-control date-input rounded-0 dates" name="end_date"
-                                    placeholder="End Date" autocomplete="off">
-                            </div> --}}
-
+                  --}}
                             <div class="col-6 col-md-6 col-xl-1 text-end">
                                 <a type="reset" href="{{ route('notification') }}"
                                     class="btn-reset px-4 text-decoration-underline" value="Clear">Clear </a>
@@ -177,11 +164,9 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    {{-- <th>Reference No.</th> --}}
-                                    {{-- <th>School</th> --}}
+                        
                                     <th>EMIS Number</th>
-                                    {{-- <th>Request type</th> --}}
-                                    {{-- <th>Procurement Type</th> --}}
+             
                                     <th>Message</th>
                                     <th>Date Created</th>
                                     <th>Manage</th>
@@ -192,20 +177,11 @@
                                 @foreach ($data as $record)
                                     @if ($record->seen == '0')
                                         <tr style="background-color:rgb(196, 223, 232)">
-                                            {{-- <td>{{ $record->References_Number }}</td> --}}
-
-                                            {{-- <td>{{ $record->SchoolName }}</td> --}}
+                                 
                                             <td>{{ $record->School_Emis }}</td>
-
-                                            {{-- <td>{{ $record->Request }}</td> --}}
-                                            {{-- <td>{{ $record->RequestType }}</td> --}}
-
-
-
-
                                             <td>{!! nl2br(e($record->Message ?? 'N/A')) !!}</td>
 
-                                            <td>{{ $record->Date }}</td>
+                                            <td>{{ $record->DateTime }}</td>
 
                                             <td>
                                                 <div class="d-flex">
@@ -224,7 +200,7 @@
                                                         @csrf
 
                                                         <input type="hidden" value="{{ $record->Id }}"
-                                                            name="del">
+                                                            name="delNotification">
 
                                                         <!-- Button trigger modal -->
                                                         <button class="btn-reset" type="button" data-bs-toggle="modal"
@@ -278,7 +254,7 @@
 
                                             <td>{!! nl2br(e($record->Message ?? 'N/A')) !!}</td>
 
-                                            <td>{{ $record->Date }}</td>
+                                            <td>{{ $record->DateTime }}</td>
 
                                             <td>
                                                 <div class="d-flex">
@@ -293,11 +269,11 @@
                                                         </button>
                                                     </form>
 
-                                                    <form action="{{ route('action2') }}" method="POST">
+                                                    <form action="{{ route('DeleteMessage') }}" method="POST">
                                                         @csrf
 
                                                         <input type="hidden" value="{{ $record->Id }}"
-                                                            name="del">
+                                                            name="delNotification">
 
                                                         <!-- Button trigger modal -->
                                                         <button class="btn-reset" type="button" data-bs-toggle="modal"

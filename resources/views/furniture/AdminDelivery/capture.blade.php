@@ -10,6 +10,8 @@
         $OutStandingAmount = 0;
         $totalCapturedQuantity =0;
         $totalPriceCapturedQuantityNew = 0;
+
+        $totalQuantity =0;
     @endphp
 
     <main>
@@ -352,7 +354,7 @@
                                 method="post">
                                 @csrf
                                 <input type="hidden" name="UncheckedItems" value="">
-<center>  <span id="EllaEatBreatAndSource" style="color: red; display:none;">Execeeded expected quantity</span></center>
+                                    <center>  <span id="EllaEatBreatAndSource" style="color: red; display:none;">Execeeded expected quantity</span></center>
                                 <div {{-- class="table-responsive" --}}>
                                     <table class="table">
                                         <thead>
@@ -413,11 +415,6 @@
                                                                 @php
                                                                 $deliveredQuantity= $item->Quantity ;
                                                                 $totalCapturedQuantity=  session('allTextbookItemsSaved')->where('ISBN', $item->ISBN)->sum('Captured_Quantity');
-
-                                                            //    $totCaptOrderedQuant=  
-                                                             //   echo "<script>console.log('".$totalCapturedQuantity."')</script>";
-                                                              //  dump($totalCapturedQuantity);
-                                                                 //   echo "<script>alert('".$totalCapturedQuantity."')</script>"
                                                             @endphp
 
                                                         <td>
@@ -433,10 +430,19 @@
                                                                 min="" required disabled
                                                                 value="{{ $item->Quantity ?? '' }}"
                                                                 @if (session('quoteStatus') == 'Quote Created') disabled @endif
-                                                                onblur="validateInput(this)">
+                                                               >
                                                             </span>
 
+
                                                         </td>
+
+                                                        @php
+                                                      //  $totalQuantity = $item->Quantity;
+
+                                                        $totalQuantity += $item->Quantity;
+
+                                                      // or {{$totalQuantity}} if this is within a Blade template
+                                                       @endphp
                                                         <td>
 
                                                             {{-- <input type="number" class="form-control input-sm quantity-input input" name="CapturedQuantity[{{ $item->id }}]" id="Quantity_{{ $item->id }}" style="box-shadow: 0 0 0 0.25rem #7cbf7a; width: 60px; height: 20px;" min="0" disabled required> --}}
@@ -448,7 +454,10 @@
                                                                 value="{{-- {{ session('textbookDataFromDatabase')->where('ISBN', $item->ISBN)->first()->Captured_Quantity ?? '' }} --}}"
                                                                 style="box-shadow: 0 0 0 0.25rem #7cbf7a; width: 60px; height: 20px;"
                                                                 max="{{ $item->Quantity }}"
-                                                                oninput="highlightIfMax(this, {{ $item->Quantity }}, {{ $totalCapturedQuantity }}, {{ $deliveredQuantity }}, event);">
+                                                                oninput="highlightIfMax(this, {{ $item->Quantity }}, {{ $totalCapturedQuantity }}, {{ $deliveredQuantity }}, event);"
+                                                                onblur="validateInput(this)" disabled
+                                                                
+                                                                required>
 
                                                         </td>
                                                     </tr>
@@ -461,6 +470,12 @@
                                                     @endphp
 
                                                 @endforeach
+
+                                                @php
+                                                     // echo $totalQuantity; 
+
+                                                      session(['totalQuantityNew' => $totalQuantity ]);
+                                                @endphp
 
                                                 <input type="hidden" value="{{$totalPriceCapturedQuantityNew}}" name="TPCapQuantity">
 
@@ -519,7 +534,7 @@
                                     </div>
 
                                     <center>
-                                        <div class="card" id="minQuotesSelection">
+                                        {{-- <div class="card" id="minQuotesSelection">
                                             <h5 class="card-header" style =" color:#14A44D">Check for final capture </h5>
                                             <div class="card-body">
                                                 <div class="form-check form-check-inline">
@@ -530,7 +545,7 @@
                                                 </div>
                                                 <br>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                 </div>
 
 
@@ -549,13 +564,7 @@
 
                                 </div>
 
-                                <div class="row justify-content-center align-items-center g-4"
-                                style="margin-right: -90px;">
-                                <div class="col-6 col-md-6 col-xl-2">
-                                    <u><a href="{{ route('AdminDelivery.list') }}" >Continue Capture Delivery</a></u>
-
-
-                                </div>
+                          
 
                             </div>
 
@@ -764,7 +773,7 @@
                                             <input type="hidden" name="totalPriceCapturedQuantity"
                                                 value="{{ $totalPriceCapturedQuantity }}">
                                             <input type="hidden" name="statement" value="{{ $statement }}">
-
+{{-- 
                                             <center><label><b>School Total Order Amount: </b> <b
                                                         style="color:blue">R{{ $OrderAmount }}</b> </label>
                                                 &nbsp; &nbsp; <label><b>Total Captured Quantity Amount:</b> <b
@@ -773,7 +782,7 @@
                                                             style="color:red">{{ $statement }}</b></label>
 
 
-                                            </center>
+                                            </center> --}}
 
 
                                             </tbody>
@@ -787,12 +796,18 @@
 
                                 @csrf
 
-                                <button @if (session('quoteStatus') == 'Quote Created' || count($dataSavedTextbook) < 1) disabled @endif class="btn btn-primary btn-sm"
+                                {{-- <button @if (session('quoteStatus') == 'Quote Created' || count($dataSavedTextbook) < 1) disabled @endif class="btn btn-primary btn-sm"
                                     id="sumitbuttton" type="button" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal">
-                                    SUBMITs
-                                </button>
+                                    SUBMIT
+                                </button> --}}
 
+                                <div class="col-6 col-md-6 col-xl-2">
+                                    <u><a href="{{ route('AdminDelivery.list') }}" >Continue Capture Delivery</a></u>
+
+
+                                </div>
+                        
                                 <div class="modal fade" id="exampleModal" tabindex="-1"
                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered popup-alert">
@@ -847,9 +862,9 @@
             document.getElementById("preventSubmission").value = "true";
 //alert('Code')
 //document.querySelector('form[name="saveItemsForm"] input[type="submit"]').disabled = true;
-document.getElementById("EllaEatBreatAndSource").style.display ='block';
+            document.getElementById("EllaEatBreatAndSource").style.display ='block';
 
-document.getElementById("submitFormButton").disabled = true;
+          document.getElementById("submitFormButton").disabled = true;
         } else {
             inputElement.style.boxShadow = "0 0 0 0.25rem #7cbf7a";
             document.getElementById("preventSubmission").value = "false";
@@ -879,16 +894,21 @@ document.getElementById("submitFormButton").disabled = true;
     <script>
         function validateInput(input) {
 
-            var value = input.value;
+            // var value = input.value;
 
-            // Check if the value is blank or below 1
-            if (value !== '' && parseInt(value) > 0) {
-                // Set the border color to red
-                input.style.boxShadow = '0 0 0 0.25rem #7cbf7a';
-            } else {
+            // // Check if the value is blank or below 1
+            // if (value !== '' && parseInt(value) > 0) {
+            //     // Set the border color to red
+            //     input.style.boxShadow = '0 0 0 0.25rem #7cbf7a';
 
-                input.style.boxShadow = '0 0 0 0.25rem red';
-            }
+
+
+            // } else {
+
+            //     input.style.boxShadow = '0 0 0 0.25rem red';
+            //     document.getElementById("submitFormButton").disabled = true;
+
+            // }
 
         }
     </script>
@@ -1002,6 +1022,25 @@ document.getElementById("submitFormButton").disabled = true;
         //         }
         //     });
         // });
+
+
+        $(document).ready(function() {
+
+// Listen for changes in the checkbox state
+$(".checkbox").change(function() {
+    var input = $(this).closest("tr").find(".input");
+    if (this.checked) {
+        // Checkbox is checked, enable the input
+        input.prop("disabled", false);
+    } else {
+        // Checkbox is unchecked, clear and disable the input
+        //    input.prop("disabled", true);
+        input.val('').prop("disabled", true);
+
+    }
+});
+});
+
     </script>
 
     <script>

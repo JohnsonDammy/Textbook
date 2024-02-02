@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\CommitteeModel;
 use App\Models\School;
+use App\Models\Lookup;
+
+
 
 
 
@@ -86,10 +89,11 @@ class CommitteeMember extends Controller
 
     public function edit($id)
     {
-  
+        $designations = Lookup::pluck('Designation');
+
         $data  = CommitteeModel::where('Id', $id)->first();
 
-        return view('furniture.Committee.edit', compact('data'));
+        return view('furniture.Committee.edit', compact('data', 'designations'));
     }
 
 
@@ -111,8 +115,19 @@ class CommitteeMember extends Controller
     
     public function add()
     {
-        return view('furniture.Committee.add');
+        $designations = Lookup::pluck('Designation');
+
+    
+        return view('furniture.Committee.add', compact('designations')); 
+       }
+
+    public function populateDropdown()
+    {
+        $designations = Lookup::pluck('Designation');
+        return view('furniture.Committee.add', ['designation' => $designations]);
     }
+
+
 
     public function update(Request $request, $id)
     {

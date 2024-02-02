@@ -9,6 +9,9 @@ use App\Models\OrderLetterModel;
 use App\Models\School;
 use App\Models\UploadOrderLetterModel;
 use App\Helpers\SendEmail;
+use App\Models\capturedsuppliers;
+use App\Models\savedsuppliers;
+
 
 class ApproveOrder extends Controller
 {
@@ -51,13 +54,17 @@ class ApproveOrder extends Controller
 $DeliveryDate = OrderLetterModel::where('EMIS', session('emis'))->where('RequestType',   session('requestType') )->value('DeliveryDate');
 $FailDate = OrderLetterModel::where('EMIS', session('emis'))->where('RequestType',   session('requestType') )->value('FailDate');
 
+$SupplierID = savedsuppliers::where('emis', session('emis'))->where('requestType',   session('requestType') )->value('id');
+
+$QuoteDate = capturedsuppliers::where('savedSupplierID', $SupplierID)->value('Date');
 
 $pdf = SnappyPDF::loadView('Section21_C.AdminSupplierOrder.OrderLatter', [
             'CapturedData' => $CapturedData,
             'school_principal' => $school_principal,
             'requestType' =>  session('requestType'),
             'DeliveryDate' => $DeliveryDate,
-            'FailDate' => $FailDate
+            'FailDate' => $FailDate,
+            'QuoteDate' => $QuoteDate
             
     
         ])->setOption('orientation', 'Portrait')->setOption('page-size', 'A4');
@@ -97,6 +104,7 @@ $pdf = SnappyPDF::loadView('Section21_C.AdminSupplierOrder.OrderLatter', [
 
 
      //Download EF58 
+     
      public function OrderLetter()
      {
         // $emis = auth()->user()->username;

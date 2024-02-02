@@ -186,7 +186,7 @@
                             @else
                                 @foreach (session('dataNew') as $key => $delivery)
                                     <tbody>
-                                        <td>{{ $delivery->Id }}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>{{ $delivery->RequestType }}</td>
 
 

@@ -22,10 +22,15 @@ class Funds extends Controller
     $AllocatedStationery=UploadModel::where('EMIS', $emis)->value('STATIONERY ALLOCATION');
 
 
-    $TextBoookProcument = RequestPrecurementModel::where('School_Emis', $emis)->value('Textbook'); 
-    $StationaryProcument = RequestPrecurementModel::where('School_Emis', $emis)->value('Stationary'); 
-    $NoDeclaration = RequestPrecurementModel::where('School_Emis', $emis)->value('NoDeclaration'); 
+    // $TextBoookProcument = RequestPrecurementModel::where('School_Emis', $emis)->value('Textbook'); 
+    // $StationaryProcument = RequestPrecurementModel::where('School_Emis', $emis)->value('Stationary'); 
+    // $NoDeclaration = RequestPrecurementModel::where('School_Emis', $emis)->value('NoDeclaration'); 
     
+    $TextBoookProcument = RequestPrecurementModel::where('School_Emis', $emis)->where('year', date('Y'))->value('Textbook'); 
+    $StationaryProcument = RequestPrecurementModel::where('School_Emis', $emis)->where('year', date('Y'))->value('Stationary'); 
+    $NoDeclaration = RequestPrecurementModel::where('School_Emis', $emis)->where('year', date('Y'))->value('NoDeclaration');
+
+
 
     if($StationaryProcument=='Yes' && $TextBoookProcument=='Yes')
         {
