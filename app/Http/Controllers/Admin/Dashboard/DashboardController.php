@@ -14,10 +14,10 @@ class DashboardController extends Controller
     public function __construct(DashboardRepositoryInterface $dashboardRepository)
     {
         $this->dashboardRepository = $dashboardRepository;
-        $this->middleware('permission:dashboard-list', ['only' => [
-            'index', 'statusCountBarChart', 'progressPieChart', 'previousCountTreeMap',
-            'pendingCollectionsDownload', 'ytdStatusCountDownload', 'previousYearCountDownload'
-        ]]);
+        // $this->middleware('permission:dashboard-list', ['only' => [
+        //     'index', 'statusCountBarChart', 'progressPieChart', 'previousCountTreeMap',
+        //     'pendingCollectionsDownload', 'ytdStatusCountDownload', 'previousYearCountDownload'
+        // ]]);
     }
 
     public function index()
@@ -28,8 +28,10 @@ class DashboardController extends Controller
         $progressPercent = $this->progressPieChart();
         $previousCount = $this->previousCountTreeMap();
         return view('furniture.dashboard.dashboard', [
-            'count' => $count, 'pending_collections' => $pendingCollections,
-            'ytd_status_count' => $ytdStatusCount, 'progress_percent' => $progressPercent,
+            'count' => $count,
+             'pending_collections' => $pendingCollections,
+            'ytd_status_count' => $ytdStatusCount,
+             'progress_percent' => $progressPercent,
             'previous_year_count' => $previousCount
         ]);
     }

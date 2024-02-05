@@ -24,7 +24,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <span style="cursor: pointer;" id="download_ytd_statuses_count">YTD Status Count <img title="click to download" class="img-fluid download-icon" src="{{asset('img/download.svg')}}" alt="download" srcset=""> </span>
+                                    <span style="cursor: pointer;" id="download_ytd_statuses_count">YTD Status Count </span>
                                 </h5>
                                 <figure class="highcharts-figure">
                                     <div id="graph-1"></div>
@@ -42,7 +42,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12">
+                    {{-- <div class="col-12">
                         <div class="card shadow-none">
                             <div class="card-body px-0">
                                 <h5 class="card-title">
@@ -112,34 +112,39 @@
                             </div>
                         </div>
 
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <div class="col-xl-4">
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
                         <div class="dashboard-card warning">
-                            <p class="mb-0">Pending Collections - {{ $count['pending_collection'] }}</p>
+                            <p class="mb-0">Textbook & Stationery   {{ $count['TextbookAndStationaryCount'] }} </p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="dashboard-card success">
-                            <p class="mb-0">Total Deliveries - {{ $count['total_deliveries'] }}</p>
+                            <p class="mb-0">Allocation Funds - {{ $count['AllocationFundsSchoolCount'] }}</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="dashboard-card danger">
-                            <p class="mb-0">Pending Repairs - {{ $count['pending_repairs'] }}</p>
+                            <p class="mb-0">Stationery - {{ $count['StationaryCount'] }}</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="dashboard-card primary">
-                            <p class="mb-0">Pending Deliveries - {{ $count['pending_deliveries'] }}</p>
+                            <p class="mb-0">Textbook  - {{ $count['TextbookCount'] }}</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="dashboard-card info-new" style="background-color:purple">
+                            <p class="mb-0">Quote Requested- {{ $count['SchoolQuoteRequestedCount'] }}</p>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="dashboard-card info">
-                            <p class="mb-0">Pending Replenishments - {{ $count['pending_replenishments'] }}</p>
+                            <p class="mb-0">Quote Recieve- {{ $count['SchoolQuoteRecieveCount'] }}</p>
                         </div>
                     </div>
                     <div class="col-12">
@@ -173,9 +178,8 @@
         },
         xAxis: {
             categories: [
-                 'Pending Collection', 'Collection Accepted', 'Pending Repairs', 'Repair Completed', 
-                 'Pending Replenishment Approval', 'Replenishment Approved', 'Replenishment Rejected',
-                 'Partial Replenishment', 'Pending Delivery', 'Delivery Confirmed'
+                 'Textbook', 'Stationery', 'Textbook & Stationery', 'AllocationFunds', 
+                 'Quote Requested', 'Quote Receieve'
             ]
         },
         yAxis: {

@@ -10,7 +10,6 @@ use App\Models\RequestFundsModel;
 use App\Models\RequestPrecurementModel;
 use App\Models\User;
 use App\Models\doc_quote;
-
 use App\Models\deliveryCapture;
 use Illuminate\Support\Facades\DB;
 
@@ -57,12 +56,22 @@ class ViewComposerServiceProvider extends ServiceProvider
             ->count();
 
 
+            $countPending = deliveryCapture::where('isFinal',null) ->count();
+
+            $countinbox = inbox_school::where('school_emis', $emis)->where('status', "",) ->where('activity_name', "Create Quote")->count();
+                             
+
 
             $user = Auth::user()->username;
             $district_id = User::where('username', $user)->value('District_id');
             $quotesData = doc_quote::all();
             $deliveryData = deliveryCapture::all();
-            
+             
+            $countNonNullChecklistNames = inbox_school::where('district_id', $district_id)
+                    ->where('status', 'Quote Received')
+                    ->where('checkListName',null)->count();
+                        
+                                                    
     
             $isActive = "1";
     
@@ -86,7 +95,10 @@ class ViewComposerServiceProvider extends ServiceProvider
                  ->with('HideForNoDeclaration',   $HideForNoDeclaration)
                  ->with('hideDelivery', $hideDelivery)
                  ->with('notificationInbox', $notificationInbox)
-                 ->with('countDelivery', $countDelivery);
+                 ->with('countDelivery', $countDelivery)
+                 ->with('countPending',  $countPending)
+                 ->with('countNonNullChecklistNames',  $countNonNullChecklistNames)
+                 ->with('countinbox',  $countinbox);
 
 
         });

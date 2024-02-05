@@ -7,6 +7,14 @@ use App\Models\BrokenItem;
 use App\Models\CollectionRequest;
 use App\Models\ReplenishmentStatus;
 use App\Models\RequestStatus;
+use App\Models\inbox;
+use App\Models\inbox_school;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Facades\Auth;
+
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Request;
 
@@ -14,18 +22,37 @@ class DashboardRepository implements DashboardRepositoryInterface
 {
     public function getTotalCount()
     {
-        $pendingCollection = CollectionRequest::where('status_id', '=', RequestStatus::COLLECTION_PENDING)->get()->count();
-        $totalDeliveries = CollectionRequest::where('status_id', '=', RequestStatus::DELIVERY_CONFIRMED)->get()->count();
-        $pendingReplenishments = CollectionRequest::where('replenishment_status', '=', ReplenishmentStatus::PENDING)->get()->count();
-        $pendingRepairs = CollectionRequest::where('status_id', '=', RequestStatus::REPAIR_PENDING)->get()->count();
-        $pendingDeliveries = CollectionRequest::where('status_id', '=', RequestStatus::DELIVERY_PENDING)->get()->count();
 
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
+
+        //SELECT COUNT(*) FROM `inbox` WHERE RequestType ="TextbookAndStationary" and District_Id =1;
+
+        //1.	How many schools used allocated funds
+        //SELECT * FROM `inbox` where RequestType ="Allocation Funds" and District_Id =1;
+        //SELECT DISTINCT count(school_emis) FROM `inbox_school` where status ="Quote Received" and district_id =1 group by school_emis;
+        //SELECT DISTINCT count(school_emis) FROM `inbox_school` where status ="Quote Requested" and district_id =1 group by school_emis;
+
+        $TextbookCount = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->get()->count();
+        $TextbookAndStationaryCount = inbox::where('RequestType', '=', "TextbookAndStationary")->where('District_Id' , $district_id)->get()->count();
+        $StationaryCount = inbox::where('RequestType', '=', "Stationary")->where('District_Id' , $district_id)->get()->count();
+        $AllocationFundsSchoolCount = inbox::where('RequestType', '=', "Allocation Funds")->where('District_Id' , $district_id)->get()->count();
+        $SchoolQuoteRequestedCount = inbox_school::where('status', '=', 'Quote Requested')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
+
+        $SchoolQuoteRecieveCount = inbox_school::where('status', '=', 'Quote Received')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
+    
         $totalCount = [
-            'pending_collection' => $pendingCollection,
-            'total_deliveries' => $totalDeliveries,
-            'pending_replenishments' => $pendingReplenishments,
-            'pending_repairs' => $pendingRepairs,
-            'pending_deliveries' => $pendingDeliveries
+            'TextbookCount' => $TextbookCount,
+            'TextbookAndStationaryCount' => $TextbookAndStationaryCount,
+            'StationaryCount' => $StationaryCount,
+            'AllocationFundsSchoolCount' => $AllocationFundsSchoolCount,
+            'SchoolQuoteRequestedCount' => $SchoolQuoteRequestedCount,
+            'SchoolQuoteRecieveCount' => $SchoolQuoteRecieveCount
+
         ];
         return $totalCount;
     }
@@ -63,86 +90,35 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function getYtdStatusCount()
     {
-        $rejectReplenishments = $approveReplenishments = $partialReplenishments = $repairCompleted = $pendingReplenishments = $pendingRepairs = $pendingDeliveries = $pendingCollection = $deliveryConfirmed = $collectionAccept = 0;
-        $month = Carbon::now()->format('m');
-        $year = Carbon::now()->format('Y');
-        if ($month > 3) {
-            $data = CollectionRequest::whereBetween('created_at', array($year . "-04-01 00:00:00", $year + 1 . "-03-31 23:59:59"))->get();
-        } else {
-            $data = CollectionRequest::whereBetween('created_at', array($year - 1 . "-04-01 00:00:00", $year . "-03-31 23:59:59"))->get();
-        }
-        if (count($data) > 0) {
-            foreach ($data as $request) {
-                $approveCountSum = 0;
-                $repCountSum = 0;
-                switch ($request->status_id) {
-                    case (RequestStatus::COLLECTION_PENDING):
-                        $pendingCollection++;
-                        break;
 
-                    case (RequestStatus::COLLECTION_ACCEPTED):
-                        $collectionAccept++;
-                        break;
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
 
-                    case (RequestStatus::REPAIR_PENDING):
-                        $pendingRepairs++;
-                        break;
+        $total  = $TextbookCount = $TextbookAndStationaryCount = $StationaryCount = $AllocationFundsSchoolCount = $SchoolQuoteRequestedCount = $SchoolQuoteRecieveCount = 0;
 
-                    case (RequestStatus::REPAIR_COMPLETED):
-                        $repairCompleted++;
-                        break;
+        
+        $TextbookCount = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->get()->count();
+        $TextbookAndStationaryCount = inbox::where('RequestType', '=', "TextbookAndStationary")->where('District_Id' , $district_id)->get()->count();
+        $StationaryCount = inbox::where('RequestType', '=', "Stationary")->where('District_Id' , $district_id)->get()->count();
+        $AllocationFundsSchoolCount = inbox::where('RequestType', '=', "Allocation Funds")->where('District_Id' , $district_id)->get()->count();
+        $SchoolQuoteRequestedCount = inbox_school::where('status', '=', 'Quote Requested')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
 
-                    case (RequestStatus::DELIVERY_PENDING):
-                        $pendingDeliveries++;
-                        break;
-
-                    case (RequestStatus::DELIVERY_CONFIRMED):
-                        $deliveryConfirmed++;
-                        break;
-
-                    default:
-                        $msg = 'Something went wrong.';
-                }
-                switch ($request->replenishment_status) {
-                    case (ReplenishmentStatus::PENDING):
-                        $pendingReplenishments++;
-                        break;
-
-                    case (ReplenishmentStatus::COMPLETE):
-                        $itemList = BrokenItem::where('collect_req_id', '=', $request->id)->get();
-                        foreach ($itemList as $li) {
-                            $approveCountSum += $li->approved_replenished_count;
-                            $repCountSum += $li->replenished_count;
-                        }
-                        if ($repCountSum != 0) {
-                            if ($approveCountSum == 0) {
-                                $rejectReplenishments++;
-                            } else {
-                                if ($approveCountSum == $repCountSum) {
-                                    $approveReplenishments++;
-                                } else {
-                                    $partialReplenishments++;
-                                }
-                            }
-                        }
-                        break;
-
-                    default:
-                        $msg = 'Something went wrong.';
-                }
-            }
-        }
+        $SchoolQuoteRecieveCount = inbox_school::where('status', '=', 'Quote Received')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
+        
+        
         $ytdStatusCount = [
-            'pending_collection' => $pendingCollection,
-            'collection_accepted' => $collectionAccept,
-            'pending_repairs' => $pendingRepairs,
-            'repair_completed' => $repairCompleted,
-            'pending_replenishment' => $pendingReplenishments,
-            'replenishment_approved' => $approveReplenishments,
-            'replenishment_rejected' => $rejectReplenishments,
-            'partial_replenishment' => $partialReplenishments,
-            'pending_delivery' => $pendingDeliveries,
-            'delivery_confirmed' => $deliveryConfirmed
+            'TextbookCount' => $TextbookCount,
+            'StationaryCount' => $StationaryCount,
+
+            'TextbookAndStationaryCount' => $TextbookAndStationaryCount,
+            'AllocationFundsSchoolCount' => $AllocationFundsSchoolCount,
+            'SchoolQuoteRequestedCount' => $SchoolQuoteRequestedCount,
+            'SchoolQuoteRecieveCount' => $SchoolQuoteRecieveCount,
+   
         ];
         return $ytdStatusCount;
     }
@@ -194,58 +170,44 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function getProgressCollectionCount()
     {
-        $total  = $delivery_confirmed = $pending_delivery = $pending_repairs = $pending_replenishment_approval = $repair_completed = $replenishment_approved = $replenishment_rejected = 0;
 
-        $broken_items = BrokenItem::all();
-        foreach ($broken_items as $key => $value) {
-            $collection =  $value->getCollectionDetails;
-            if ($collection) {
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
 
-                // $total += $value->confirmed_count;
+        $total  = $TextbookCount = $TextbookAndStationaryCount = $StationaryCount = $AllocationFundsSchoolCount = $SchoolQuoteRequestedCount = $SchoolQuoteRecieveCount = 0;
 
-                if ($collection->status_id == RequestStatus::REPAIR_PENDING) {
-                    if ($collection->replenishment_status != null) {
-                        if ($collection->replenishment_status == ReplenishmentStatus::PENDING) {
-                            $pending_replenishment_approval += $value->replenished_count;
-                        }
-                        $pending_repairs += $value->repaired_count;
-                    } else {
-                        $pending_repairs += $value->confirmed_count;
-                    }
-                }
+        
+        $TextbookCount = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->get()->count();
+        $TextbookAndStationaryCount = inbox::where('RequestType', '=', "TextbookAndStationary")->where('District_Id' , $district_id)->get()->count();
+        $StationaryCount = inbox::where('RequestType', '=', "Stationary")->where('District_Id' , $district_id)->get()->count();
+        $AllocationFundsSchoolCount = inbox::where('RequestType', '=', "Allocation Funds")->where('District_Id' , $district_id)->get()->count();
+        $SchoolQuoteRequestedCount = inbox_school::where('status', '=', 'Quote Requested')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
 
-                if ($collection->replenishment_status == ReplenishmentStatus::COMPLETE) {
-                    $replenishment_approved += $value->approved_replenished_count;
-                    $replenishment_rejected += $value->rejected_replenished_count;
-                }
+        $SchoolQuoteRecieveCount = inbox_school::where('status', '=', 'Quote Received')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
+    
 
-                if ($collection->status_id == RequestStatus::REPAIR_COMPLETED) {
-                    $repair_completed += $value->repaired_count;
-                }
 
-                if ($collection->status_id == RequestStatus::DELIVERY_PENDING) {
-                    $pending_delivery += $value->delivered_count;
-                }
 
-                if ($collection->status_id == RequestStatus::DELIVERY_CONFIRMED) {
-                    $delivery_confirmed += $value->delivered_count;
-                }
-            }
-        }
-
-        $total = $delivery_confirmed +  $pending_delivery + $pending_repairs + $pending_replenishment_approval + $repair_completed + $replenishment_approved + $replenishment_rejected;
+        $total = $TextbookCount +  $TextbookAndStationaryCount + $StationaryCount + $AllocationFundsSchoolCount + $SchoolQuoteRequestedCount + $SchoolQuoteRecieveCount;
         if ($total == 0) {
             $total = 1;
         }
+
+
         $list = [
             
-            "pending_repairs" => number_format(($pending_repairs / $total) * 100, 2),
-             "repair_completed" => number_format(($repair_completed / $total) * 100, 2),
-             "pending_replenishment_approval" => number_format(($pending_replenishment_approval / $total) * 100, 2),
-            "replenishment_approved" => number_format(($replenishment_approved / $total) * 100, 2),
-            "replenishment_rejected" => number_format(($replenishment_rejected / $total) * 100, 2),
-            "pending_delivery" => number_format(($pending_delivery / $total) * 100, 2),
-            "delivery_confirmed" => number_format(($delivery_confirmed / $total) * 100, 2),
+            "Textbook" => number_format(($TextbookCount)),
+             "Textbook & Stationery" => number_format(($TextbookAndStationaryCount)),
+             "Stationary" => number_format(($StationaryCount)),
+            "AllocationFunds" => number_format(($AllocationFundsSchoolCount)),
+            "Quote Requested" => number_format(($SchoolQuoteRequestedCount)),
+            "Quote Recieve" => number_format(($SchoolQuoteRecieveCount)),
+
+     
             
         ];
         return $list;
@@ -253,87 +215,31 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function previousYearStatusCount()
     {
-        $rejectReplenishments = $approveReplenishments = $partialReplenishments = $repairCompleted = $pendingReplenishments = $pendingRepairs = $pendingDeliveries = $pendingCollection = $deliveryConfirmed = $collectionAccept = 0;
-        $month = Carbon::now()->format('m');
-        $year = Carbon::now()->format('Y');
-        if ($month > 3) {
-            $data = CollectionRequest::whereBetween('created_at', array($year - 1 . "-04-01 00:00:00", $year . "-03-31 23:59:59"))->get();
-        } else {
-            $data = CollectionRequest::whereBetween('created_at', array($year - 2 . "-04-01 00:00:00", $year - 1 . "-03-31 23:59:59"))->get();
-        }
-        if (count($data) > 0) {
-            foreach ($data as $request) {
-                $approveCountSum = 0;
-                $repCountSum = 0;
-                switch ($request->status_id) {
-                    case (RequestStatus::COLLECTION_PENDING):
-                        $pendingCollection++;
-                        break;
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
 
-                    case (RequestStatus::COLLECTION_ACCEPTED):
-                        $collectionAccept++;
-                        break;
+        $total  = $TextbookCount = $TextbookAndStationaryCount = $StationaryCount = $AllocationFundsSchoolCount = $SchoolQuoteRequestedCount = $SchoolQuoteRecieveCount = 0;
 
-                    case (RequestStatus::REPAIR_PENDING):
-                        $pendingRepairs++;
-                        break;
+        
+        $TextbookCount = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->get()->count();
+        $TextbookAndStationaryCount = inbox::where('RequestType', '=', "TextbookAndStationary")->where('District_Id' , $district_id)->get()->count();
+        $StationaryCount = inbox::where('RequestType', '=', "Stationary")->where('District_Id' , $district_id)->get()->count();
+        $AllocationFundsSchoolCount = inbox::where('RequestType', '=', "Allocation Funds")->where('District_Id' , $district_id)->get()->count();
+        $SchoolQuoteRequestedCount = inbox_school::where('status', '=', 'Quote Requested')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
 
-                    case (RequestStatus::REPAIR_COMPLETED):
-                        $repairCompleted++;
-                        break;
-
-                    case (RequestStatus::DELIVERY_PENDING):
-                        $pendingDeliveries++;
-                        break;
-
-                    case (RequestStatus::DELIVERY_CONFIRMED):
-                        $deliveryConfirmed++;
-                        break;
-
-                    default:
-                        $msg = 'Something went wrong.';
-                }
-                switch ($request->replenishment_status) {
-                    case (ReplenishmentStatus::PENDING):
-                        $pendingReplenishments++;
-                        break;
-
-                    case (ReplenishmentStatus::COMPLETE):
-                        $itemList = BrokenItem::where('collect_req_id', '=', $request->id)->get();
-                        foreach ($itemList as $li) {
-                            $approveCountSum += $li->approved_replenished_count;
-                            $repCountSum += $li->replenished_count;
-                        }
-                        if ($repCountSum != 0) {
-                            if ($approveCountSum == 0) {
-                                $rejectReplenishments++;
-                            } else {
-                                if ($approveCountSum == $repCountSum) {
-                                    $approveReplenishments++;
-                                } else {
-                                    $partialReplenishments++;
-                                }
-                            }
-                        }
-
-                        break;
-
-                    default:
-                        $msg = 'Something went wrong.';
-                }
-            }
-        }
+        $SchoolQuoteRecieveCount = inbox_school::where('status', '=', 'Quote Received')->where('district_id', $district_id)->groupBy('school_emis')
+        ->get(['school_emis', DB::raw('COUNT(*) as emis_count')])
+        ->count();
+        
         $previousYearCount = [
-            'pending_collection' => $pendingCollection,
-            'collection_accepted' => $collectionAccept,
-            'pending_repairs' => $pendingRepairs,
-            'repair_completed' => $repairCompleted,
-            'pending_replenishment' => $pendingReplenishments,
-            'replenishment_approved' => $approveReplenishments,
-            'replenishment_rejected' => $rejectReplenishments,
-            'partial_replenishment' => $partialReplenishments,
-            'pending_delivery' => $pendingDeliveries,
-            'delivery_confirmed' => $deliveryConfirmed
+            'Textbook' => $TextbookCount,
+            'Stationery' => $StationaryCount,
+            'Textbook & Stationery' => $TextbookAndStationaryCount,
+            'AllocationFunds' => $AllocationFundsSchoolCount,
+            'Quote Requested' => $SchoolQuoteRequestedCount,
+            'Quote Receive' => $SchoolQuoteRecieveCount,
 
         ];
         return $previousYearCount;

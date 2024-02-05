@@ -95,14 +95,12 @@
                                     <span> Home</span>
                                 </a>
                             </li>
-                            @can('dashboard-list')
                             <li>
                                 <a href="/dashboard">
                                     <img src="{{ asset('img/dashboard-icon.svg') }}" class="img-fluid" alt="">
                                     <span> dashboard</span>
                                 </a>
                             </li>
-                            @endcan
                             @if (Auth::user()->getOrganization->id == 2)
                             
                             <li>
@@ -119,7 +117,10 @@
 
                                 <a href="{{ route('inboxSchool') }}">
                                     <i class="fa fa-inbox" style="font-size:20px; color: green" ></i>
-                                    <span style="margin-left:-7px">Inbox</span>
+                                    {{-- <i class="fa fa-inbox" style=" color: green"><span style="color:red; font-size:14px"><strong>{{$countinbox}}</strong></span></i> --}}
+                                    <span style="margin-left:-7px"><span style="color:red; font-size:17px; margin-left:-7px "><strong>{{$countinbox}}</strong>&nbsp;</span>Inbox</span>
+                                    {{-- <span style="color:red; font-size:14px, margin-left: -5px;" ><strong>{{$countinbox}}</strong></span> --}}
+                                    {{-- <span style="margin-left:5px">Inbox</span> --}}
                                 </a>
                             </li>
                             @endif
@@ -262,9 +263,10 @@
                             </li> --}}
 
                             <li>
+                              
                                 <a href="{{ route('AdminDelivery.list') }}">
                                     <i class="fas fa-shipping-fast" style="font-size:20px; color: green" ></i>
-                                    <span style="margin-left:-7px"><span style="color:red; font-size:17px; margin-left:-7px "><strong>{{$countDelivery}}</strong></span>   Capture Delivery</span>
+                                    <span style="margin-left:-7px"><span style="color:red; font-size:17px; margin-left:-7px "><strong>{{$countPending}}</strong></span>Capture Delivery</span>
                                 </a>
                             </li>
 
@@ -274,8 +276,10 @@
  
                                 <a href="{{ route('InboxSchoolDistrict') }}">
                                     <img src="{{ asset('img/maintenance-icon.svg') }}" class="img-fluid" alt="">
-                                    <span style="">View School Request</span>
                                    
+                                    <span style="margin-left:-6px"><span style="color:red; font-size:17px; margin-left:-5px "> &nbsp;&nbsp;<strong>{{$countNonNullChecklistNames}}</strong> &nbsp;</span>View School Request</span>
+                                  
+                                 
                                 </a>
                             </li>
                             @endif
