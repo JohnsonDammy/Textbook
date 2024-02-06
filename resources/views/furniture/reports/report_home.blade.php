@@ -34,6 +34,7 @@
             </div>
         </div>
 </main>
+
 <script>
     $('#furniture-category').change(function() {
       var report = $("#furniture-category").val();
