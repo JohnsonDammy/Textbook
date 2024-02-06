@@ -20,14 +20,13 @@
                 <div class="form-group">
                     <select class="form-control form-control-lg fs-4 wide rounded-0" id="furniture-category">
                         <option value="/reports" selected>Select Report Type</option>
-                        <option value="/reports/replenishment">Replenishment Report</option>
-                        <option value="/reports/disposal">Disposal Report</option>
-                        @if(Auth::user()->organization != 2)
-                        <option value="/reports/stock">Catalogue Report
-                        </option>@endif
-                        <option value="/reports/furniture-count">LTSM Count Report</option>
-                        <option value="/reports/repairment">Repairment Report</option>
-                        <option value="/reports/transaction-summary">Transactions Summary Report</option>
+                        <option value="/reports/NOSTextbookReport" >NOS - Textbook Report</option>
+                        <option value="/reports/NOSStationeryReport">NOS - Stationery Report</option>
+                        <option value="/reports/stock">NOS Textbook & Stationery
+                        </option>
+                        <option value="/reports/furniture-count">Allocation Funds Report</option>
+                        <option value="/reports/repairment">NOS Request Quote Report</option>
+                        <option value="/reports/transaction-summary">NOS Recieve Funds</option>
                         <option value="/reports/transaction-status">Transactions Status Report</option>
                     </select>
                     <label class="bg-white fs-5 px-1 top--7">Select Report</label>

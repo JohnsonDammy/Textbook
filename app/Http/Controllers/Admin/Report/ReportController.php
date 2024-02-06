@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CollectionRequestSearch;
 use App\Interfaces\Reports\ReportsRepositoryInterface;
 use App\Models\School;
+use App\Models\Inbox;
+use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
+
 
 use function PHPSTORM_META\type;
 
@@ -38,6 +42,49 @@ class ReportController extends Controller
         return view('furniture.reports.report_home');
     }
 
+
+
+    //Textbook Report
+    public function NOSTextbookReport(Request $request)
+    {
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
+                
+        $data = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->paginate(10);
+
+        if ($data) {
+   
+                $list = [
+                    "next_page" => $data->nextPageUrl(),
+                    "previous_page" => $data->previousPageUrl()
+                ];
+            
+        }
+        return view('furniture.reports.NOSTextbook_Report', ['data' => $data]);
+
+    }
+
+    //Stationery Report
+    public function NOSStationeryReport(Request $request)
+    {
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
+                
+        $data = inbox::where('RequestType', '=', "Stationary")->where('District_Id' , $district_id)->paginate(10);
+
+        if ($data) {
+   
+                $list = [
+                    "next_page" => $data->nextPageUrl(),
+                    "previous_page" => $data->previousPageUrl()
+                ];
+            
+        }
+        return view('furniture.reports.NOSStationery_Report', ['data' => $data]);
+
+    }
+
+
     public function replenishment(Request $request)
     {
         $data = $this->reportRepository->getReplenishmentReport($request);
@@ -62,6 +109,17 @@ class ReportController extends Controller
         $data = $this->reportRepository->getReplenishmentReport($request);
         $xls = $this->getExcel($data['records']);
         return $xls;
+    }
+
+    public function NOSTextbookDownload(Request $request){
+        $user = Auth::user()->username;
+        $district_id = User::where('username', $user)->value('District_id');
+                
+        $data = inbox::where('RequestType', '=', "Textbook")->where('District_Id' , $district_id)->paginate(10);
+
+        $xls = $this->getExcel($data);
+        return $xls;
+
     }
 
     public function disposal(Request $request)

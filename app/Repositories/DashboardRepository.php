@@ -199,13 +199,15 @@ class DashboardRepository implements DashboardRepositoryInterface
 
 
         $list = [
+            // "pending_repairs" => number_format(($pending_repairs / $total) * 100, 2),
+
             
-            "Textbook" => number_format(($TextbookCount)),
-             "Textbook & Stationery" => number_format(($TextbookAndStationaryCount)),
-             "Stationary" => number_format(($StationaryCount)),
-            "AllocationFunds" => number_format(($AllocationFundsSchoolCount)),
-            "Quote Requested" => number_format(($SchoolQuoteRequestedCount)),
-            "Quote Recieve" => number_format(($SchoolQuoteRecieveCount)),
+            "Textbook" => number_format(($TextbookCount  / $total) * 100, 2),
+             "Textbook & Stationery" => number_format(($TextbookAndStationaryCount / $total) * 100, 2 ),
+             "Stationery" => number_format(($StationaryCount / $total) * 100, 2),
+            "AllocationFunds" => number_format(($AllocationFundsSchoolCount / $total) * 100 , 2),
+            "Quote Requested" => number_format(($SchoolQuoteRequestedCount / $total) * 100 , 2),
+            "Quote Received" => number_format(($SchoolQuoteRecieveCount / $total) * 100 , 2),
 
      
             
@@ -239,7 +241,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             'Textbook & Stationery' => $TextbookAndStationaryCount,
             'AllocationFunds' => $AllocationFundsSchoolCount,
             'Quote Requested' => $SchoolQuoteRequestedCount,
-            'Quote Receive' => $SchoolQuoteRecieveCount,
+            'Quote Received' => $SchoolQuoteRecieveCount,
 
         ];
         return $previousYearCount;

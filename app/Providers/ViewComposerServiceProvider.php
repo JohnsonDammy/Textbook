@@ -58,8 +58,12 @@ class ViewComposerServiceProvider extends ServiceProvider
 
             $countPending = deliveryCapture::where('isFinal',null) ->count();
 
-            $countinbox = inbox_school::where('school_emis', $emis)->where('status', "",) ->where('activity_name', "Create Quote")->count();
+            //$countinbox = inbox_school::where('school_emis', $emis)->where('status', "",) ->where('activity_name', "Create Quote")->count();
                              
+
+            $countinbox = inbox_school::where('school_emis', $emis)
+            ->whereNotIn('activity_name', ['completed'])
+            ->count();
 
 
             $user = Auth::user()->username;

@@ -95,12 +95,7 @@
                                     <span> Home</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="/dashboard">
-                                    <img src="{{ asset('img/dashboard-icon.svg') }}" class="img-fluid" alt="">
-                                    <span> dashboard</span>
-                                </a>
-                            </li>
+                       
                             @if (Auth::user()->getOrganization->id == 2)
                             
                             <li>
@@ -238,6 +233,12 @@
 
 
                             @if (Auth::user()->getOrganization->id == 3)
+                            <li>
+                                <a href="/dashboard">
+                                    <img src="{{ asset('img/dashboard-icon.svg') }}" class="img-fluid" alt="">
+                                    <span> dashboard</span>
+                                </a>
+                            </li>
                             <li>
                                 <a href="{{ route('notification') }}">
                                     {{-- {{$count}} --}}

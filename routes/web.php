@@ -344,8 +344,18 @@ Route::get('/downloadSignedEF58',[\App\Http\Controllers\AdminCaptureSupplierOder
     Route::get('/reports', [\App\Http\Controllers\Admin\Report\ReportController::class, 'reporthome']);
 
     Route::get('/reports/replenishment', [\App\Http\Controllers\Admin\Report\ReportController::class, 'replenishment']);
+
+    Route::get('/reports/NOSTextbookReport', [\App\Http\Controllers\Admin\Report\ReportController::class, 'NOSTextbookReport']);
+
+    Route::get('/reports/NOSStationeryReport', [\App\Http\Controllers\Admin\Report\ReportController::class, 'NOSStationeryReport']);
+
+
+    
     Route::get('/reports/replenishment/search', [\App\Http\Controllers\Admin\Report\ReportController::class, 'replenishmentSearch']);
     Route::get('/reports/replenishment/download', [\App\Http\Controllers\Admin\Report\ReportController::class, 'replenishmentDownload']);
+    
+    Route::get('/reports/NOSTextbook/download', [\App\Http\Controllers\Admin\Report\ReportController::class, 'NOSTextbookDownload']);
+
 
     Route::get('/reports/disposal', [\App\Http\Controllers\Admin\Report\ReportController::class, 'disposal']);
     Route::get('/reports/disposal/search', [\App\Http\Controllers\Admin\Report\ReportController::class, 'disposalSearch']);
